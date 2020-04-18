@@ -4,7 +4,6 @@ use amethyst::{
 		AnimationSetPrefab, EndControl,
 	},
 	assets::{Handle, PrefabData, PrefabLoader, ProgressCounter, RonFormat},
-	core::transform::Transform,
 	derive::PrefabData,
 	ecs::{prelude::Entity, Entities, Join, ReadStorage, WriteStorage},
 	error::Error,
@@ -18,7 +17,7 @@ use amethyst::{
 };
 use serde::{Deserialize, Serialize};
 
-use crate::utils::{load_background, load_sprite_sheet, screen_dimensions};
+use crate::utils::{load_background, load_sprite_sheet};
 
 
 /// Animation ids used in a AnimationSet
@@ -40,6 +39,7 @@ pub struct MyPrefabData {
 #[derive(Default)]
 pub struct GameState {
 	fire_loading_progress: Option<ProgressCounter>,
+	fire_entity: Option<Entity>,
 
 	background_handle: Option<Handle<SpriteSheet>>,
 }
@@ -60,10 +60,12 @@ impl SimpleState for GameState {
 			)
 		});
 
-		world
+		let fire_entity = world
 			.create_entity()
 			.with(fire_prefab)
 			.build();
+
+		self.fire_entity = Some(fire_entity);
 
 		self.background_handle.replace(load_sprite_sheet(world, "game_background.png", "game_background.ron"));
 		let _entity = load_background(world, self.background_handle.clone().unwrap());
@@ -120,5 +122,15 @@ impl SimpleState for GameState {
 		}
 
 		Trans::None
+	}
+
+	fn on_stop(&mut self, data: StateData<'_, GameData<'_, '_>>) {
+		log::info!("GameState::on_stop");
+
+		let StateData { world, .. } = data;
+
+		if let Some(fire_entity) = self.fire_entity.take() {
+			let _ = world.delete_entity(fire_entity);
+		}
 	}
 }
