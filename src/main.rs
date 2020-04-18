@@ -1,10 +1,12 @@
 use amethyst::{
+	animation::AnimationBundle,
+	assets::{PrefabLoaderSystemDesc},
 	core::{TransformBundle},
 	prelude::*,
 	renderer::{
 		plugins::{RenderFlat2D, RenderToWindow},
 		types::DefaultBackend,
-		RenderingBundle,
+		RenderingBundle, SpriteRender,
 	},
 	utils::application_root_dir,
 };
@@ -14,6 +16,7 @@ mod states;
 mod utils;
 
 use crate::states::{MenuState};
+use crate::states::game::{AnimationId, MyPrefabData};
 
 
 fn main() -> amethyst::Result<()> {
@@ -26,6 +29,15 @@ fn main() -> amethyst::Result<()> {
 	let display_config_path = app_root.join("config/display.ron");
 
 	let game_data = GameDataBuilder::default()
+	.with_system_desc(
+			PrefabLoaderSystemDesc::<MyPrefabData>::default(),
+			"scene_loader",
+			&[],
+		)
+		.with_bundle(AnimationBundle::<AnimationId, SpriteRender>::new(
+			"sprite_animation_control",
+			"sprite_sampler_interpolation",
+		))?
 		.with_bundle(TransformBundle::new())?
 		.with_bundle(
 			RenderingBundle::<DefaultBackend>::new()

@@ -29,12 +29,10 @@ impl SimpleState for MenuState {
 	}
 
 	fn on_pause(&mut self, data: StateData<'_, GameData<'_, '_>>) {
-		log::info!("on_pause!");
 		self.delete_background(data.world);
 	}
 
 	fn on_resume(&mut self, data: StateData<'_, GameData<'_, '_>>) {
-		log::info!("on_resume!");
 		self.initialize_background(data.world);
 	}
 
@@ -48,7 +46,7 @@ impl SimpleState for MenuState {
 			}
 			else if is_key_down(&event, winit::VirtualKeyCode::Space) {
 				Trans::Push(Box::new(
-					GameState {},
+					GameState::default(),
 				))
 			}
 			else {
