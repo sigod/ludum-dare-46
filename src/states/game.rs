@@ -3,7 +3,8 @@ use amethyst::{
 		get_animation_set, AnimationCommand, AnimationControlSet, AnimationSet,
 		AnimationSetPrefab, EndControl,
 	},
-	assets::{PrefabData, PrefabLoader, ProgressCounter, RonFormat},
+	assets::{Handle, PrefabData, PrefabLoader, ProgressCounter, RonFormat},
+	core::transform::Transform,
 	derive::PrefabData,
 	ecs::{prelude::Entity, Entities, Join, ReadStorage, WriteStorage},
 	error::Error,
@@ -11,10 +12,13 @@ use amethyst::{
 	prelude::*,
 	renderer::{
 		sprite::{prefab::SpriteScenePrefab, SpriteRender},
+		SpriteSheet,
 	},
 	GameData, SimpleState, SimpleTrans, StateData, Trans, winit,
 };
 use serde::{Deserialize, Serialize};
+
+use crate::utils::{load_background, load_sprite_sheet, screen_dimensions};
 
 
 /// Animation ids used in a AnimationSet
@@ -35,22 +39,24 @@ pub struct MyPrefabData {
 
 #[derive(Default)]
 pub struct GameState {
-	progress_counter: Option<ProgressCounter>,
+	fire_loading_progress: Option<ProgressCounter>,
+
+	background_handle: Option<Handle<SpriteSheet>>,
 }
 
 impl SimpleState for GameState {
 	fn on_start(&mut self, data: StateData<'_, GameData<'_, '_>>) {
 		log::info!("GameState::on_start");
 
-		let world = data.world;
+		let StateData { world, .. } = data;
 
-		self.progress_counter = Some(Default::default());
+		self.fire_loading_progress = Some(Default::default());
 
 		let fire_prefab = world.exec(|loader: PrefabLoader<'_, MyPrefabData>| {
 			loader.load(
 				"fire_animation.ron",
 				RonFormat,
-				self.progress_counter.as_mut().unwrap(),
+				self.fire_loading_progress.as_mut().unwrap(),
 			)
 		});
 
@@ -58,6 +64,9 @@ impl SimpleState for GameState {
 			.create_entity()
 			.with(fire_prefab)
 			.build();
+
+		self.background_handle.replace(load_sprite_sheet(world, "game_background.png", "game_background.ron"));
+		let _entity = load_background(world, self.background_handle.clone().unwrap());
 	}
 
 	fn handle_event(&mut self,
@@ -80,8 +89,8 @@ impl SimpleState for GameState {
 	fn update(&mut self, data: &mut StateData<'_, GameData<'_, '_>>) -> SimpleTrans {
 		let StateData { world, .. } = data;
 
-		if let Some(progress_counter) = &self.progress_counter {
-			if progress_counter.is_complete() {
+		if let Some(fire_loading_progress) = &self.fire_loading_progress {
+			if fire_loading_progress.is_complete() {
 				// Execute a pass similar to a system
 				world.exec(
 					|(entities, animation_sets, mut control_sets): (
@@ -106,7 +115,7 @@ impl SimpleState for GameState {
 				);
 
 				// All data loaded
-				self.progress_counter = None;
+				self.fire_loading_progress = None;
 			}
 		}
 

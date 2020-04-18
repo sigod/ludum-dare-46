@@ -4,11 +4,10 @@ use amethyst::ecs::Entity;
 use amethyst::input::{is_close_requested, is_key_down};
 use amethyst::prelude::*;
 use amethyst::renderer::Camera;
-use amethyst::renderer::SpriteRender;
 use amethyst::renderer::SpriteSheet;
 use amethyst::winit;
 
-use crate::utils::{load_sprite_sheet, screen_dimensions};
+use crate::utils::{load_background, load_sprite_sheet, screen_dimensions};
 use super::GameState;
 
 
@@ -62,23 +61,7 @@ impl SimpleState for MenuState {
 impl MenuState {
 	fn initialize_background(&mut self, world: &mut World) {
 		if let Some(sprite_sheet) = &self.handle {
-			let (width, height) = screen_dimensions(world);
-
-			let mut transform = Transform::default();
-			transform.set_translation_xyz(width * 0.5, height * 0.5, 0.0);
-
-			let sprite = SpriteRender {
-				sprite_sheet: sprite_sheet.clone(),
-				sprite_number: 0,
-			};
-
-			let entity = world
-				.create_entity()
-				.with(transform)
-				.with(sprite)
-				.build();
-
-			self.background_entity.replace(entity);
+			self.background_entity.replace(load_background(world, sprite_sheet.clone()));
 		}
 	}
 
