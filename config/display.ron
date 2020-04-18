@@ -1,0 +1,5 @@
+(
+	title: "Ludum Dare 46",
+	dimensions: Some((1280, 800)),
+	resizable: false,
+)
