@@ -28,6 +28,7 @@ use crate::systems::InteractionSystem;
 fn main() -> amethyst::Result<()> {
 	amethyst::Logger::from_config(Default::default())
 		.level_for("*", log::LevelFilter::Debug)
+		.level_for("ludum_dare_46", log::LevelFilter::Debug)
 		.start();
 
 	let app_root = application_root_dir()?;

@@ -7,7 +7,6 @@
 
 Prefab(
 	entities: [
-		// Grey bat
 		PrefabEntity(
 			data: MyPrefabData(
 				// SpriteScenePrefab
@@ -15,7 +14,7 @@ Prefab(
 					// SpriteSheetPrefab with index 0
 					sheet: Sheet(
 						// TexturePrefab
-						texture: File("fire_sprites.png", (
+						texture: File("game_background_shadows.png", (
 							"IMAGE", (
 								sampler_info: (
 									min_filter: Nearest,
@@ -38,11 +37,11 @@ Prefab(
 							// Grey bat sprites
 							// Sprites with indexes from 0 to 5
 							Grid((
-								texture_width: 2400,
-								texture_height: 660,
-								columns: 6,
+								texture_width: 3840,
+								texture_height: 2400,
+								columns: 3,
 								rows: 3,
-								cell_size: (400, 220),
+								cell_size: (1280, 800),
 								// Shifts the grid by 32 pixels down and the bat changes to brown
 								// position: (0, 32),
 							)),
@@ -62,15 +61,15 @@ Prefab(
 							// )),
 						],
 						// optional
-						name: "fire",
+						name: "game_background_shadows",
 					),
 					// SpriteRenderPrefab
 					render: (
-						sheet: "fire",
+						sheet: "game_background_shadows",
 						sprite_number: 0,
 					),
 					transform: (
-						translation: (630.0, 185.0, -99.0),
+						translation: (640.0, 400.0, -98.0),
 					),
 				),
 				// AnimationSetPrefab
@@ -87,9 +86,9 @@ Prefab(
 										SpriteIndex,
 										(
 											// Time of key frames
-											input: [0.0, 0.1, 0.2, 0.3, 0.4, 0.5, 0.6],
+											input: [0.0, 0.1, 0.2, 0.3],
 											// Sprite indexes from SpriteSheet for key frames
-											output: [0, 1, 2, 3, 4, 5, 0],
+											output: [0, 1, 2, 0],
 											// Sprites can only ever be animated with Step
 											function: Step,
 										)
@@ -105,8 +104,8 @@ Prefab(
 										0,
 										SpriteIndex,
 										(
-											input: [0.0, 0.1, 0.2, 0.3, 0.4, 0.5, 0.6],
-											output: [6, 7, 8, 9, 10, 11, 6],
+											input: [0.0, 0.1, 0.2, 0.3],
+											output: [3, 4, 5, 3],
 											function: Step,
 										)
 									),
@@ -121,8 +120,8 @@ Prefab(
 										0,
 										SpriteIndex,
 										(
-											input: [0.0, 0.1, 0.2, 0.3, 0.4, 0.5, 0.6],
-											output: [12, 13, 14, 15, 16, 17, 12],
+											input: [0.0, 0.1, 0.2, 0.3],
+											output: [6, 7, 8, 6],
 											function: Step,
 										)
 									),
