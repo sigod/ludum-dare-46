@@ -1,47 +1,26 @@
 use amethyst::{
 	animation::{
 		get_animation_set, AnimationCommand, AnimationControlSet, AnimationSet,
-		AnimationSetPrefab, EndControl,
+		EndControl,
 	},
-	assets::{PrefabData, ProgressCounter},
 	core::{
 		transform::Transform,
 		Named
 	},
-	derive::PrefabData,
-	ecs::{prelude::Entity, Entities, Join, ReadStorage, WriteStorage},
-	error::Error,
+	ecs::{Entities, Join, Read, ReadStorage, WriteStorage},
 	input::{is_key_down},
 	prelude::*,
 	renderer::{
-		sprite::{prefab::SpriteScenePrefab, SpriteRender},
+		sprite::{ SpriteRender},
 	},
 	GameData, SimpleState, SimpleTrans, StateData, Trans, winit,
 };
-use serde::{Deserialize, Serialize};
 
 use crate::audio::initialise_audio;
 use crate::audio::{play_background_sound, Sounds};
-
+use crate::animations::AnimationId;
+use crate::game::{CurrentState, Game};
 use super::loading::GameEntities;
-
-
-/// Animation ids used in a AnimationSet
-#[derive(Eq, PartialOrd, PartialEq, Hash, Debug, Copy, Clone, Deserialize, Serialize)]
-pub enum AnimationId {
-	BurnLow,
-	BurnMedium,
-	BurnHigh,
-}
-
-/// Loading data for one entity
-#[derive(Debug, Clone, Deserialize, PrefabData)]
-pub struct MyPrefabData {
-	/// Information for rendering a scene with sprites
-	sprite_scene: SpriteScenePrefab,
-	/// Аll animations that can be run on the entity
-	animation_set: AnimationSetPrefab<AnimationId, SpriteRender>,
-}
 
 
 pub struct GameState {
@@ -73,8 +52,9 @@ impl GameState {
 	fn start_fire(&mut self, world: &mut World) {
 		// Execute a pass similar to a system
 		world.exec(
-			|(entities, animation_sets, mut control_sets): (
+			|(entities, game, animation_sets, mut control_sets): (
 				Entities,
+				Read<Game>,
 				ReadStorage<AnimationSet<AnimationId, SpriteRender>>,
 				WriteStorage<AnimationControlSet<AnimationId, SpriteRender>>,
 			)| {
@@ -84,8 +64,8 @@ impl GameState {
 					let control_set = get_animation_set(&mut control_sets, entity).unwrap();
 					// Adds the `Fly` animation to AnimationControlSet and loops infinitely
 					control_set.add_animation(
-						AnimationId::BurnLow,
-						&animation_set.get(&AnimationId::BurnLow).unwrap(),
+						game.animation_id,
+						&animation_set.get(&game.animation_id).unwrap(),
 						EndControl::Loop(None),
 						1.0,
 						AnimationCommand::Start,
@@ -105,15 +85,21 @@ impl SimpleState for GameState {
 		self.initialise_audio(world);
 		self.init_entities(world);
 		self.start_fire(world);
+		*world.write_resource::<CurrentState>() = CurrentState::Running;
 		play_background_sound(&*sounds, &storage, audio_output.as_ref().map(|o| o.deref()));
+
 	}
 
 	fn handle_event(&mut self,
-		_data: StateData<'_, GameData<'_, '_>>,
+		data: StateData<'_, GameData<'_, '_>>,
 		event: StateEvent,
 	) -> SimpleTrans {
+		let StateData { world, .. } = data;
+
 		if let StateEvent::Window(event) = &event {
 			if is_key_down(&event, winit::VirtualKeyCode::Escape) {
+				*world.write_resource::<CurrentState>() = CurrentState::Paused;
+
 				Trans::Pop
 			}
 			else {

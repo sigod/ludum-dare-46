@@ -3,6 +3,7 @@ use amethyst::{
 	assets::{PrefabLoaderSystemDesc},
 	core::{TransformBundle},
 	prelude::*,
+	input::{InputBundle, StringBindings},
 	renderer::{
 		plugins::{RenderFlat2D, RenderToWindow},
 		types::DefaultBackend,
@@ -12,14 +13,20 @@ use amethyst::{
 };
 
 
+mod animations;
+mod game;
 mod states;
+mod systems;
 mod utils;
 mod audio;
 use amethyst::audio::AudioBundle;
 
+use crate::animations::{AnimationId, MyPrefabData};
+use crate::game::{CurrentState};
 use crate::states::{LoadingState};
 use crate::states::game::{AnimationId, MyPrefabData};
 use crate::audio::{play_background_sound, Sounds};
+use crate::systems::InteractionSystem;
 
 
 fn main() -> amethyst::Result<()> {
@@ -32,7 +39,7 @@ fn main() -> amethyst::Result<()> {
 	let display_config_path = app_root.join("config").join("display.ron");
 
 	let game_data = GameDataBuilder::default()
-	.with_system_desc(
+		.with_system_desc(
 			PrefabLoaderSystemDesc::<MyPrefabData>::default(),
 			"scene_loader",
 			&[],
@@ -43,6 +50,7 @@ fn main() -> amethyst::Result<()> {
 			"sprite_sampler_interpolation",
 		))?
 		.with_bundle(TransformBundle::new())?
+		.with_bundle(InputBundle::<StringBindings>::new())?
 		.with_bundle(
 			RenderingBundle::<DefaultBackend>::new()
 				.with_plugin(
@@ -51,7 +59,12 @@ fn main() -> amethyst::Result<()> {
 						.with_clear([1.0, 0.078, 0.576, 1.0]),
 				)
 				.with_plugin(RenderFlat2D::default()),
-		)?;
+		)?
+		.with(
+			InteractionSystem::default().pausable(CurrentState::Running),
+			"interaction_system",
+			&["input_system"]
+		);
 
 	let mut game = Application::build(assets_directory, LoadingState::default())?.build(game_data)?;
 	game.run();

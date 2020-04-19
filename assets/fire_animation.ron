@@ -70,7 +70,7 @@ Prefab(
 						sprite_number: 0,
 					),
 					transform: (
-						translation: (640.0, 110.0, -10.0),
+						translation: (630.0, 185.0, -10.0),
 					),
 				),
 				// AnimationSetPrefab
