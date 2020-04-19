@@ -14,5 +14,6 @@ serde = "1.0.106"
 version = "0.15"
 features = ["vulkan"]
 
-[profile.dev.package."*"]
-opt-level = 2
+# Need cargo nightly for this.
+# [profile.release.package.amethyst_animation]
+# opt-level = 1
