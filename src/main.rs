@@ -15,7 +15,7 @@ use amethyst::{
 mod states;
 mod utils;
 
-use crate::states::{MenuState};
+use crate::states::{LoadingState};
 use crate::states::game::{AnimationId, MyPrefabData};
 
 
@@ -49,7 +49,7 @@ fn main() -> amethyst::Result<()> {
 				.with_plugin(RenderFlat2D::default()),
 		)?;
 
-	let mut game = Application::build(assets_directory, MenuState::default())?.build(game_data)?;
+	let mut game = Application::build(assets_directory, LoadingState::default())?.build(game_data)?;
 	game.run();
 	Ok(())
 }
