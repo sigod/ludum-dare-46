@@ -1,44 +1,23 @@
 use amethyst::{
 	animation::{
 		get_animation_set, AnimationCommand, AnimationControlSet, AnimationSet,
-		AnimationSetPrefab, EndControl,
+		EndControl,
 	},
-	assets::{PrefabData, ProgressCounter},
 	core::{
 		transform::Transform,
 		Named
 	},
-	derive::PrefabData,
-	ecs::{prelude::Entity, Entities, Join, ReadStorage, WriteStorage},
-	error::Error,
+	ecs::{Entities, Join, ReadStorage, WriteStorage},
 	input::{is_key_down},
 	prelude::*,
 	renderer::{
-		sprite::{prefab::SpriteScenePrefab, SpriteRender},
+		sprite::{ SpriteRender},
 	},
 	GameData, SimpleState, SimpleTrans, StateData, Trans, winit,
 };
-use serde::{Deserialize, Serialize};
 
 use super::loading::GameEntities;
-
-
-/// Animation ids used in a AnimationSet
-#[derive(Eq, PartialOrd, PartialEq, Hash, Debug, Copy, Clone, Deserialize, Serialize)]
-pub enum AnimationId {
-	BurnLow,
-	BurnMedium,
-	BurnHigh,
-}
-
-/// Loading data for one entity
-#[derive(Debug, Clone, Deserialize, PrefabData)]
-pub struct MyPrefabData {
-	/// Information for rendering a scene with sprites
-	sprite_scene: SpriteScenePrefab,
-	/// Аll animations that can be run on the entity
-	animation_set: AnimationSetPrefab<AnimationId, SpriteRender>,
-}
+use crate::animations::AnimationId;
 
 
 pub struct GameState {

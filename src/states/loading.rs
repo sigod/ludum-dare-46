@@ -10,8 +10,9 @@ use amethyst::renderer::SpriteSheet;
 use amethyst::renderer::SpriteSheetFormat;
 use amethyst::renderer::Texture;
 
+use crate::animations::{MyPrefabData};
+use crate::states::{MenuState};
 use crate::utils::{screen_dimensions};
-use crate::states::{MenuState, game::MyPrefabData};
 
 
 #[derive(Clone)]
