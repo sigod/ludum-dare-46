@@ -11,6 +11,7 @@ use amethyst::renderer::SpriteSheetFormat;
 use amethyst::renderer::Texture;
 use amethyst::renderer::Transparent;
 
+use crate::audio::initialise_audio;
 use crate::animations::{MyPrefabData};
 use crate::states::{MenuState};
 use crate::utils::{screen_dimensions};
@@ -82,6 +83,8 @@ impl SimpleState for LoadingState {
 			camp_fire,
 			game_background_shadows,
 		});
+
+		initialise_audio(world);
 	}
 
 	fn update(&mut self, _data: &mut StateData<'_, GameData<'_, '_>>) -> SimpleTrans {

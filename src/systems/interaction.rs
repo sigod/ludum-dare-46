@@ -3,15 +3,19 @@ use amethyst::{
 		get_animation_set, AnimationCommand, AnimationControlSet, AnimationSet,
 		EndControl,
 	},
-	ecs::{Entities, Join, Read, ReadStorage, System, Write, WriteStorage},
+	assets::AssetStorage,
+	audio::{output::Output, Source},
+	ecs::{Entities, Join, Read, ReadExpect, ReadStorage, System, Write, WriteStorage},
 	input::{InputHandler, StringBindings},
 	renderer::{
 		sprite::{SpriteRender},
 	},
 	winit::MouseButton,
 };
+use std::ops::Deref;
 
 use crate::animations::AnimationId;
+use crate::audio::{play_background_sound, Sounds};
 use crate::game::Game;
 
 
@@ -25,9 +29,23 @@ impl<'s> System<'s> for InteractionSystem {
 		ReadStorage<'s, AnimationSet<AnimationId, SpriteRender>>,
 		WriteStorage<'s, AnimationControlSet<AnimationId, SpriteRender>>,
 		Write<'s, Game>,
+		Read<'s, AssetStorage<Source>>,
+		ReadExpect<'s, Sounds>,
+		Option<Read<'s, Output>>,
+		amethyst::ecs::WriteExpect<'s, amethyst::audio::AudioSink>,
 	);
 
-	fn run(&mut self, (entities, input, animation_sets, mut control_sets, mut game): Self::SystemData) {
+	fn run(&mut self, (
+		entities,
+		input,
+		animation_sets,
+		mut control_sets,
+		mut game,
+		storage,
+		sounds,
+		audio_output,
+		mut audio_sink,
+	): Self::SystemData) {
 		if !game.click && input.mouse_button_is_down(MouseButton::Left) {
 			log::debug!("left mouse button is down");
 
@@ -41,6 +59,10 @@ impl<'s> System<'s> for InteractionSystem {
 					AnimationId::BurnMedium => AnimationId::BurnHigh,
 					AnimationId::BurnHigh => AnimationId::BurnLow,
 				};
+
+				if game.animation_id == AnimationId::BurnHigh {
+					audio_sink.set_volume(0.1);
+				}
 
 				log::debug!("animation_id: {:?} -> {:?}", previous_id, game.animation_id);
 
@@ -58,8 +80,9 @@ impl<'s> System<'s> for InteractionSystem {
 						1.0,
 						AnimationCommand::Start,
 					);
-
 				}
+
+				play_background_sound(&*sounds, &storage, audio_output.as_deref());
 			}
 		}
 

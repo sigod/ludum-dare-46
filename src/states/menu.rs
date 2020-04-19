@@ -1,13 +1,30 @@
+use amethyst::audio::{output::Output, AudioSink, Source};
 use amethyst::core::Named;
 use amethyst::core::transform::Transform;
-use amethyst::ecs::{Join, ReadStorage, WriteStorage};
+use amethyst::ecs::{Join, ReadStorage, WriteExpect, WriteStorage};
 use amethyst::input::{is_close_requested, is_key_down};
 use amethyst::prelude::*;
 use amethyst::renderer::Camera;
 use amethyst::winit;
 
+use amethyst::{
+	animation::{
+		get_animation_set, AnimationCommand, AnimationControlSet, AnimationSet,
+		EndControl,
+	},
+	assets::AssetStorage,
+	ecs::{Entities, Read, ReadExpect, System, Write},
+	input::{InputHandler, StringBindings},
+	renderer::{
+		sprite::{SpriteRender},
+	},
+	winit::MouseButton,
+};
+use std::ops::Deref;
+
 
 use crate::utils::{screen_dimensions};
+use crate::audio::{play_background_sound, Sounds};
 use super::{GameState, loading::GameEntities};
 
 
@@ -23,6 +40,7 @@ impl SimpleState for MenuState {
 
 		initialize_camera(world);
 		self.show_background(world);
+		self.play_audio(world);
 	}
 
 	fn on_pause(&mut self, data: StateData<'_, GameData<'_, '_>>) {
@@ -82,6 +100,25 @@ impl MenuState {
 					if named.name == "menu" {
 						transform.set_translation_z(100.0);
 					}
+				}
+			},
+		);
+	}
+
+	fn play_audio(&mut self, world: &mut World) {
+		world.exec(
+			|(storage, sounds, audio_sink): (
+				Read<AssetStorage<Source>>,
+				ReadExpect<Sounds>,
+				// Option<Read<Output>>,
+				WriteExpect<AudioSink>,
+			)| {
+				// TODO: thread 'rodio audio processing' panicked at 'assertion failed: self.next_frame.is_empty()', <::std::macros::panic macros>:2:4
+
+				// play_background_sound(&*sounds, &storage, audio_output.as_deref());
+
+				if let Some(sound) = storage.get(&sounds.background_sfx) {
+					audio_sink.append(sound).unwrap();
 				}
 			},
 		);

@@ -1,6 +1,7 @@
 use amethyst::{
 	animation::AnimationBundle,
 	assets::{PrefabLoaderSystemDesc},
+	audio::{AudioBundle, DjSystemDesc, SourceHandle},
 	core::{TransformBundle},
 	prelude::*,
 	input::{InputBundle, StringBindings},
@@ -19,14 +20,12 @@ mod states;
 mod systems;
 mod utils;
 mod audio;
-use amethyst::audio::AudioBundle;
 
 use crate::animations::{AnimationId, MyPrefabData};
 use crate::game::{CurrentState};
 use crate::states::{LoadingState};
-use crate::states::game::{AnimationId, MyPrefabData};
 use crate::audio::{play_background_sound, Sounds};
-use crate::systems::InteractionSystem;
+use crate::systems::{InteractionSystem, SoundSystem};
 
 
 fn main() -> amethyst::Result<()> {
@@ -46,6 +45,11 @@ fn main() -> amethyst::Result<()> {
 			&[],
 		)
 		.with_bundle(AudioBundle::default())?
+		.with_system_desc(
+			DjSystemDesc::new(|music: &mut Sounds| std::iter::empty::<SourceHandle>().next()),
+			"dj_system",
+			&[],
+		)
 		.with_bundle(AnimationBundle::<AnimationId, SpriteRender>::new(
 			"sprite_animation_control",
 			"sprite_sampler_interpolation",

@@ -16,8 +16,6 @@ use amethyst::{
 	GameData, SimpleState, SimpleTrans, StateData, Trans, winit,
 };
 
-use crate::audio::initialise_audio;
-use crate::audio::{play_background_sound, Sounds};
 use crate::animations::AnimationId;
 use crate::game::{CurrentState, Game};
 use super::loading::GameEntities;
@@ -82,7 +80,6 @@ impl SimpleState for GameState {
 
 		let StateData { world, .. } = data;
 
-		initialise_audio(world);
 		self.init_entities(world);
 		self.start_fire(world);
 		*world.write_resource::<CurrentState>() = CurrentState::Running;
