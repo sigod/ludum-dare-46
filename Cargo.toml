@@ -13,3 +13,6 @@ serde = "1.0.106"
 [dependencies.amethyst]
 version = "0.15"
 features = ["vulkan"]
+
+[profile.dev.package."*"]
+opt-level = 2
