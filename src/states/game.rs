@@ -7,7 +7,7 @@ use amethyst::{
 		transform::Transform,
 		Named
 	},
-	ecs::{Entities, Join, ReadStorage, WriteStorage},
+	ecs::{Entities, Join, Read, ReadStorage, WriteStorage},
 	input::{is_key_down},
 	prelude::*,
 	renderer::{
@@ -50,8 +50,9 @@ impl GameState {
 	fn start_fire(&mut self, world: &mut World) {
 		// Execute a pass similar to a system
 		world.exec(
-			|(entities, animation_sets, mut control_sets): (
+			|(entities, game, animation_sets, mut control_sets): (
 				Entities,
+				Read<Game>,
 				ReadStorage<AnimationSet<AnimationId, SpriteRender>>,
 				WriteStorage<AnimationControlSet<AnimationId, SpriteRender>>,
 			)| {
@@ -61,8 +62,8 @@ impl GameState {
 					let control_set = get_animation_set(&mut control_sets, entity).unwrap();
 					// Adds the `Fly` animation to AnimationControlSet and loops infinitely
 					control_set.add_animation(
-						AnimationId::BurnLow,
-						&animation_set.get(&AnimationId::BurnLow).unwrap(),
+						game.animation_id,
+						&animation_set.get(&game.animation_id).unwrap(),
 						EndControl::Loop(None),
 						1.0,
 						AnimationCommand::Start,
