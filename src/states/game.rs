@@ -16,8 +16,9 @@ use amethyst::{
 	GameData, SimpleState, SimpleTrans, StateData, Trans, winit,
 };
 
-use super::loading::GameEntities;
 use crate::animations::AnimationId;
+use crate::game::{CurrentState, Game};
+use super::loading::GameEntities;
 
 
 pub struct GameState {
@@ -80,14 +81,20 @@ impl SimpleState for GameState {
 
 		self.init_entities(world);
 		self.start_fire(world);
+
+		*world.write_resource::<CurrentState>() = CurrentState::Running;
 	}
 
 	fn handle_event(&mut self,
-		_data: StateData<'_, GameData<'_, '_>>,
+		data: StateData<'_, GameData<'_, '_>>,
 		event: StateEvent,
 	) -> SimpleTrans {
+		let StateData { world, .. } = data;
+
 		if let StateEvent::Window(event) = &event {
 			if is_key_down(&event, winit::VirtualKeyCode::Escape) {
+				*world.write_resource::<CurrentState>() = CurrentState::Paused;
+
 				Trans::Pop
 			}
 			else {

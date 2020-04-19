@@ -20,6 +20,7 @@ mod systems;
 mod utils;
 
 use crate::animations::{AnimationId, MyPrefabData};
+use crate::game::{CurrentState};
 use crate::states::{LoadingState};
 use crate::systems::InteractionSystem;
 
@@ -54,7 +55,11 @@ fn main() -> amethyst::Result<()> {
 				)
 				.with_plugin(RenderFlat2D::default()),
 		)?
-		.with(InteractionSystem, "interaction_system", &["input_system"]);
+		.with(
+			InteractionSystem::default().pausable(CurrentState::Running),
+			"interaction_system",
+			&["input_system"]
+		);
 
 	let mut game = Application::build(assets_directory, LoadingState::default())?.build(game_data)?;
 	game.run();

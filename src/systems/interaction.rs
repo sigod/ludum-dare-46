@@ -15,6 +15,7 @@ use crate::animations::AnimationId;
 use crate::game::Game;
 
 
+#[derive(Default)]
 pub struct InteractionSystem;
 
 impl<'s> System<'s> for InteractionSystem {
