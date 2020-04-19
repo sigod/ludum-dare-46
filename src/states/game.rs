@@ -82,11 +82,10 @@ impl SimpleState for GameState {
 
 		let StateData { world, .. } = data;
 
-		self.initialise_audio(world);
+		initialise_audio(world);
 		self.init_entities(world);
 		self.start_fire(world);
 		*world.write_resource::<CurrentState>() = CurrentState::Running;
-		play_background_sound(&*sounds, &storage, audio_output.as_ref().map(|o| o.deref()));
 
 	}
 
