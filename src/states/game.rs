@@ -20,6 +20,9 @@ use amethyst::{
 };
 use serde::{Deserialize, Serialize};
 
+use crate::audio::initialise_audio;
+use crate::audio::{play_background_sound, Sounds};
+
 use super::loading::GameEntities;
 
 
@@ -99,8 +102,10 @@ impl SimpleState for GameState {
 
 		let StateData { world, .. } = data;
 
+		self.initialise_audio(world);
 		self.init_entities(world);
 		self.start_fire(world);
+		play_background_sound(&*sounds, &storage, audio_output.as_ref().map(|o| o.deref()));
 	}
 
 	fn handle_event(&mut self,

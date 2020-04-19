@@ -14,9 +14,12 @@ use amethyst::{
 
 mod states;
 mod utils;
+mod audio;
+use amethyst::audio::AudioBundle;
 
 use crate::states::{LoadingState};
 use crate::states::game::{AnimationId, MyPrefabData};
+use crate::audio::{play_background_sound, Sounds};
 
 
 fn main() -> amethyst::Result<()> {
@@ -34,6 +37,7 @@ fn main() -> amethyst::Result<()> {
 			"scene_loader",
 			&[],
 		)
+		.with_bundle(AudioBundle::default())?
 		.with_bundle(AnimationBundle::<AnimationId, SpriteRender>::new(
 			"sprite_animation_control",
 			"sprite_sampler_interpolation",
