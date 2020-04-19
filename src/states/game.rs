@@ -23,7 +23,9 @@ use crate::utils::{load_background, load_sprite_sheet};
 /// Animation ids used in a AnimationSet
 #[derive(Eq, PartialOrd, PartialEq, Hash, Debug, Copy, Clone, Deserialize, Serialize)]
 pub enum AnimationId {
-	Burn,
+	BurnLow,
+	BurnMedium,
+	BurnHigh,
 }
 
 /// Loading data for one entity
@@ -67,8 +69,9 @@ impl SimpleState for GameState {
 
 		self.fire_entity = Some(fire_entity);
 
-		self.background_handle.replace(load_sprite_sheet(world, "game_background.png", "game_background.ron"));
-		let _entity = load_background(world, self.background_handle.clone().unwrap());
+		// TODO: Background can cover fire animation. Depends on order of loading.
+		// self.background_handle.replace(load_sprite_sheet(world, "game_background.png", "game_background.ron"));
+		// let _entity = load_background(world, self.background_handle.clone().unwrap());
 	}
 
 	fn handle_event(&mut self,
@@ -106,8 +109,8 @@ impl SimpleState for GameState {
 							let control_set = get_animation_set(&mut control_sets, entity).unwrap();
 							// Adds the `Fly` animation to AnimationControlSet and loops infinitely
 							control_set.add_animation(
-								AnimationId::Burn,
-								&animation_set.get(&AnimationId::Burn).unwrap(),
+								AnimationId::BurnLow,
+								&animation_set.get(&AnimationId::BurnLow).unwrap(),
 								EndControl::Loop(None),
 								1.0,
 								AnimationCommand::Start,
