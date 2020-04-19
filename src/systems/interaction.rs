@@ -17,7 +17,37 @@ use std::ops::Deref;
 use crate::animations::AnimationId;
 use crate::audio::{play_background_sound, Sounds};
 use crate::game::Game;
+use crate::systems::interaction::ClickedObject::{Fire, Man1, Man2, Girl1, Girl2, NoObject};
 
+#[derive(Debug)]
+enum ClickedObject {
+	Fire,
+	Man1,
+	Man2,
+	Girl1,
+	Girl2,
+	NoObject,
+}
+
+fn get_clicked_object(x: f32, y: f32) -> ClickedObject {
+
+	let fire: (f32, f32, f32, f32) = (463.0, 695.0, 796.0, 644.0);
+	let fire_2: (f32, f32, f32, f32) =  (559.0, 630.0, 669.0, 519.0);
+	let man1: (f32, f32, f32, f32) = (330.0, 603.0, 506.0, 368.0);
+	let man2: (f32, f32, f32, f32) = (915.0, 672.0, 990.0, 570.0);
+	let man2_2: (f32, f32, f32, f32) = (1001.0, 688.0, 1148.0, 387.0);
+	let girl1: (f32, f32, f32, f32) = (72.0, 719.0, 309.0, 437.0);
+	let girl2: (f32, f32, f32, f32) = (752.0, 590.0, 885.0, 366.0);
+
+	if x >= fire.0 && x <= fire.2 && y <= fire.1 && y >= fire.3 { Fire }
+	else if x >= fire_2.0 && x <= fire_2.2 && y <= fire_2.1 && y >= fire_2.3 { Fire }
+	else if x >= man1.0 && x <= man1.2 && y <= man1.1 && y >= man1.3 { Man1 }
+	else if x >= man2.0 && x <= man2.2 && y <= man2.1 && y >= man2.3 { Man2 }
+	else if x >= man2_2.0 && x <= man2_2.2 && y <= man2_2.1 && y >= man2_2.3 { Man2 }
+	else if x >= girl1.0 && x <= girl1.2 && y <= girl1.1 && y >= girl1.3 { Girl1 }
+	else if x >= girl2.0 && x <= girl2.2 && y <= girl2.1 && y >= girl2.3 { Girl2 }
+	else {NoObject}
+}
 
 #[derive(Default)]
 pub struct InteractionSystem;
@@ -51,6 +81,9 @@ impl<'s> System<'s> for InteractionSystem {
 
 			if let Some(mouse_position) = input.mouse_position() {
 				log::debug!("current mouse position: {:?}", mouse_position);
+
+				let clicked_object: ClickedObject = get_clicked_object(mouse_position.0, mouse_position.1);
+				log::debug!("current object is: {:?}", clicked_object);
 
 				let previous_id = game.animation_id;
 
