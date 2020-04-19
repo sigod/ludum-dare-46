@@ -9,6 +9,7 @@ use amethyst::renderer::SpriteRender;
 use amethyst::renderer::SpriteSheet;
 use amethyst::renderer::SpriteSheetFormat;
 use amethyst::renderer::Texture;
+use amethyst::renderer::Transparent;
 
 use crate::animations::{MyPrefabData};
 use crate::states::{MenuState};
@@ -20,6 +21,7 @@ pub struct GameEntities {
 	pub menu_background: Entity,
 	pub game_background: Entity,
 	pub camp_fire: Entity,
+	pub game_background_shadows: Entity,
 }
 
 
@@ -57,11 +59,28 @@ impl SimpleState for LoadingState {
 				.named("camp_fire")
 				.build()
 		};
+		let game_background_shadows = {
+			let fire_prefab = world.exec(|loader: PrefabLoader<'_, MyPrefabData>| {
+				loader.load(
+					"game_background_shadows.ron",
+					RonFormat,
+					&mut self.progress_counter,
+				)
+			});
+
+			world
+				.create_entity()
+				.with(fire_prefab)
+				.named("game_background_shadows")
+				.with(Transparent)
+				.build()
+		};
 
 		self.entities.replace(GameEntities {
 			menu_background,
 			game_background,
 			camp_fire,
+			game_background_shadows,
 		});
 	}
 
