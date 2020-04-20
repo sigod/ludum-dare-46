@@ -9,7 +9,7 @@ use std::path::Path;
 
 use crate::assets::Sounds;
 use crate::assets::StoryFragments;
-use crate::constants::BACKGROUND_MUSIC_VOLUME;
+use crate::constants::*;
 
 
 #[derive(Debug, Deserialize)]
@@ -221,10 +221,11 @@ impl Resources {
 		let story = StoryFragments::load(context)?;
 		let text_empty = Image::new(context, "/story/text_empty.png")?;
 		let mut music = Source::new(context, "/audio/demo_1.2.ogg")?;
-		let campfire_sound = Source::new(context, "/audio/campfire.mp3")?;
+		let mut campfire_sound = Source::new(context, "/audio/campfire.mp3")?;
 		let sounds = Sounds::load(context)?;
 
 		music.set_volume(BACKGROUND_MUSIC_VOLUME);
+		campfire_sound.set_volume(FIRE_VOLUME);
 
 		Ok(Self {
 			static_animations,

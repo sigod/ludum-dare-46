@@ -11,15 +11,7 @@ mod constants;
 
 use crate::assets::play_random;
 use crate::resources::Resources;
-use crate::constants::FIRE_DROP_OFF_RATE;
-
-
-const GAME_ID: &str = "ludum-dare-46";
-const GAME_TITLE: &str = "Ember Story";
-const AUTHOR: &str = "sigod & co";
-
-const DIMENSIONS: (f32, f32) = (1280.0, 800.0);
-const DESIRED_FPS: u32 = 70;
+use crate::constants::*;
 
 
 #[derive(Debug)]
@@ -100,7 +92,7 @@ impl MainState {
 		self.resources.static_animations.animation_id = resources::AnimationId::BurnMedium;
 
 		self.fire_intensity = 0.30;
-		self.fire_drop_off = -FIRE_DROP_OFF_RATE; //fire intensity drop off rate
+		self.fire_drop_off = -FIRE_DROP_OFF_RATE;
 		self.wood_increase = 0.20;
 
 		self.story_id = 0;
@@ -126,7 +118,7 @@ impl MainState {
 
 			if let Some(state) = next_state {
 				if self.resources.static_animations.animation_id != state {
-					log::info!("changing animation state: {:?} -> {:?}", self.resources.static_animations.animation_id, state);
+					log::debug!("changing animation state: {:?} -> {:?}", self.resources.static_animations.animation_id, state);
 					self.resources.static_animations.animation_id = state;
 				}
 
@@ -154,7 +146,7 @@ impl MainState {
 				}
 			}
 			else {
-				log::info!("fire's gone");
+				log::debug!("fire's gone");
 				self.is_menu = true;
 			}
 		}
@@ -235,21 +227,21 @@ impl event::EventHandler for MainState {
 			if let Some(object) = object {
 				match object {
 					GameObject::Fire => {
-						log::info!("clicked: fire");
+						log::debug!("clicked: fire");
 						self.add_wood();
 						let _ = play_random(&mut self.resources.sounds.firewood);
 					},
-					GameObject::Man1 => log::info!("clicked: man1"),
+					GameObject::Man1 => log::debug!("clicked: man1"),
 					GameObject::Man2 => {
-						log::info!("clicked: man2");
+						log::debug!("clicked: man2");
 						let _ = play_random(&mut self.resources.sounds.guitar);
 					},
-					GameObject::Girl1 => log::info!("clicked: girl1"),
-					GameObject::Girl2 => log::info!("clicked: girl2"),
+					GameObject::Girl1 => log::debug!("clicked: girl1"),
+					GameObject::Girl2 => log::debug!("clicked: girl2"),
 					GameObject::Owl1
 					| GameObject::Owl2
 					| GameObject::Owl3 => {
-						log::info!("clicked: an own");
+						log::debug!("clicked: an own");
 						let _ = play_random(&mut self.resources.sounds.owl);
 					},
 				};

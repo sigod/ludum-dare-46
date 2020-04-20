@@ -32,7 +32,7 @@ AnimationsDto(
 					),
 				),
 			],
-			destination: (430.0, 520.0),
+			destination: (420.0, 515.0),
 		),
 
 		AnimationDto(

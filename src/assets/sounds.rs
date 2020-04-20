@@ -16,7 +16,7 @@ pub struct Sounds {
 }
 
 impl Sounds {
-	pub fn load(context: &mut ggez::Context) -> Result<Self, Box<dyn std::error::Error>> {
+	pub fn load(context: &mut Context) -> Result<Self, Box<dyn std::error::Error>> {
 		let mut firewood = Vec::new();
 		let mut owl = Vec::new();
 		let mut guitar = Vec::new();
