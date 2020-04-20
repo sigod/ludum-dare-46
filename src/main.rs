@@ -231,13 +231,24 @@ impl event::EventHandler for MainState {
 						self.add_wood();
 						let _ = play_random(&mut self.resources.sounds.firewood);
 					},
-					GameObject::Man1 => log::debug!("clicked: man1"),
+					GameObject::Man1 => {
+						log::debug!("clicked: man1");
+						let _ = play_random(&mut self.resources.sounds.man1);
+					},
 					GameObject::Man2 => {
 						log::debug!("clicked: man2");
 						let _ = play_random(&mut self.resources.sounds.guitar);
 					},
-					GameObject::Girl1 => log::debug!("clicked: girl1"),
-					GameObject::Girl2 => log::debug!("clicked: girl2"),
+					GameObject::Girl1 => {
+						log::debug!("clicked: girl1");
+						let _ = play_random(&mut self.resources.sounds.girl1);
+					},
+
+					GameObject::Girl2 => {
+						log::debug!("clicked: girl2");
+						let _ = play_random(&mut self.resources.sounds.girl2);
+					},
+
 					GameObject::Owl1
 					| GameObject::Owl2
 					| GameObject::Owl3 => {
