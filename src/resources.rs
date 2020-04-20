@@ -38,6 +38,7 @@ pub struct AnimationDto {
 	pub texture: String,
 	pub sprites_grid: Grid,
 	pub animation_set: Vec<(AnimationId, AnimationFrames)>,
+	pub destination: (f32, f32),
 }
 
 pub struct Animation {
@@ -59,7 +60,8 @@ impl Animation {
 
 		Ok(Self {
 			texture,
-			draw_param: DrawParam::default(),
+			draw_param: DrawParam::default()
+				.dest(cgmath::Point2::new(dto.destination.0, dto.destination.1)),
 
 			animated: false,
 			start_time: 0.0,

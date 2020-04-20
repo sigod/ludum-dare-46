@@ -31,7 +31,8 @@ AnimationsDto(
 						output: [12, 13, 14, 15, 16, 17, 12],
 					),
 				),
-			]
+			],
+			destination: (430.0, 520.0),
 		),
 
 		AnimationDto(
@@ -65,7 +66,8 @@ AnimationsDto(
 						output: [6, 7, 8, 6],
 					),
 				),
-			]
+			],
+			destination: (0.0, 0.0),
 		),
 	]
 )
