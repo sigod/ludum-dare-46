@@ -1,7 +1,10 @@
+use ggez::Context;
+use ggez::graphics::{Drawable, DrawParam, Image};
 use ron::de::from_reader;
 use serde::Deserialize;
 use std::fs::File;
 use std::path::Path;
+
 
 #[derive(Debug, Deserialize)]
 pub struct Grid {
@@ -15,6 +18,8 @@ pub struct Grid {
 #[derive(Debug, Deserialize)]
 pub enum AnimationId {
 	BurnLow,
+	BurnMedium,
+	BurnHigh,
 }
 
 #[derive(Debug, Deserialize)]
@@ -31,7 +36,9 @@ pub struct AnimationDto {
 }
 
 pub struct Animation {
-	pub texture: ggez::graphics::Image,
+	pub texture: Image,
+	pub draw_param: DrawParam,
+
 	pub sprites_grid: Grid,
 	pub animation_set: Vec<(AnimationId, AnimationFrames)>,
 }
@@ -44,9 +51,25 @@ impl Animation {
 
 		Ok(Self {
 			texture,
+			draw_param: DrawParam::default(),
+
 			sprites_grid: dto.sprites_grid,
 			animation_set: dto.animation_set,
 		})
+	}
+
+	pub fn draw(&self, context: &mut Context) -> ggez::GameResult {
+		self.texture.draw(context, self.draw_param)?;
+
+		Ok(())
+	}
+
+	pub fn animate(&mut self, context: &mut Context) {
+		// if not started
+		// let start = duration_to_f64(time_since_start(context));
+
+		// TODO: Get time diff and select correct frame in AnimationFrames.
+		// TODO: Update self.draw_param.src to change which sprite (from sprite sheet) should be drawn.
 	}
 }
 
@@ -77,19 +100,30 @@ impl Animations {
 			animations,
 		})
 	}
+
+	pub fn draw(&self, context: &mut Context) {
+		// TODO: Iterate all animations and draw() them.
+	}
+
+	pub fn animate() {
+		// TODO: Same - for all.
+	}
 }
 
 
 pub struct Resources {
 	pub static_animations: Animations,
+	pub menu: Image,
 }
 
 impl Resources {
 	pub fn load(context: &mut ggez::Context, resource_path: &Path) -> Result<Self, Box<dyn std::error::Error>> {
 		let static_animations = Animations::load(context, &resource_path.join("static_animations.ron"))?;
+		let menu = Image::new(context, "/menu.png")?;
 
 		Ok(Self {
 			static_animations,
+			menu,
 		})
 	}
 }

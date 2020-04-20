@@ -12,3 +12,6 @@ ggez = "0.5"
 log = "0.4.8"
 ron = "0.5.1"
 serde = "1.0.106"
+
+[profile.dev.package."*"]
+opt-level = 2

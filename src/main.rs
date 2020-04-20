@@ -1,4 +1,5 @@
 use ggez::{self, *};
+use ggez::graphics::Drawable;
 
 mod resources;
 
@@ -44,8 +45,12 @@ impl event::EventHandler for MainState {
 	}
 
 	fn draw(&mut self, context: &mut Context) -> GameResult<()> {
-		graphics::clear(context, graphics::Color::from((0.0, 0.0, 0.0, 0.0)));
+		graphics::clear(context, graphics::Color::from((1.0, 0.078, 0.576, 0.0)));
+
 		// TODO: Draw scenes.
+		self.resources.menu.draw(context, graphics::DrawParam::default())?;
+		self.resources.static_animations.draw(context);
+
 		graphics::present(context)
 	}
 
