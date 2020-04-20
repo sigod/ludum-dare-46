@@ -1,0 +1,23 @@
+AnimationsDto(
+	animations: [
+		AnimationDto(
+			texture: "/camp_fire.png",
+			sprites_grid: Grid(
+				texture_width: 2400,
+				texture_height: 660,
+				columns: 6,
+				rows: 3,
+				cell_size: (400, 220),
+			),
+			animation_set: [
+				(
+					BurnLow,
+					(
+						input: [0.0, 0.1, 0.2, 0.3, 0.4, 0.5, 0.6],
+						output: [0, 1, 2, 3, 4, 5, 0],
+					)
+				)
+			]
+		),
+	]
+)

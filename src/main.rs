@@ -91,7 +91,7 @@ fn main() {
 	log::info!("main: screen_coordinates: {:?}", graphics::screen_coordinates(context));
 
 
-	let resources = Resources::load(&resource_path).unwrap();
+	let resources = Resources::load(context, &resource_path).expect("Failed to load resources!");
 	let state = &mut MainState::new(context, resources);
 
 	if let Err(e) = event::run(context, ev, state) {
