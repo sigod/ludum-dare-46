@@ -17,7 +17,7 @@ use std::ops::Deref;
 use crate::animations::AnimationId;
 use crate::audio::{play_background_sound, Sounds};
 use crate::game::Game;
-use crate::systems::interaction::ClickedObject::{Fire, Man1, Man2, Girl1, Girl2, NoObject};
+use crate::systems::interaction::ClickedObject::{Fire, Man1, Man2, Girl1, Girl2, NoObject, Owl1, Owl2, Owl3};
 
 #[derive(Debug)]
 enum ClickedObject {
@@ -26,6 +26,9 @@ enum ClickedObject {
 	Man2,
 	Girl1,
 	Girl2,
+	Owl1,
+	Owl2,
+	Owl3,
 	NoObject,
 }
 
@@ -38,6 +41,9 @@ fn get_clicked_object(x: f32, y: f32) -> ClickedObject {
 	let man2_2: (f32, f32, f32, f32) = (1001.0, 688.0, 1148.0, 387.0);
 	let girl1: (f32, f32, f32, f32) = (72.0, 719.0, 309.0, 437.0);
 	let girl2: (f32, f32, f32, f32) = (752.0, 590.0, 885.0, 366.0);
+	let owl1: (f32, f32, f32, f32) = (55.0, 292.0, 117.0, 242.0);
+	let owl2: (f32, f32, f32, f32) =  (139.0, 65.0, 196.0, 25.0);
+	let owl3: (f32, f32, f32, f32) = (1125.0, 161.0, 1182.0, 109.0);
 
 	if x >= fire.0 && x <= fire.2 && y <= fire.1 && y >= fire.3 { Fire }
 	else if x >= fire_2.0 && x <= fire_2.2 && y <= fire_2.1 && y >= fire_2.3 { Fire }
@@ -46,6 +52,9 @@ fn get_clicked_object(x: f32, y: f32) -> ClickedObject {
 	else if x >= man2_2.0 && x <= man2_2.2 && y <= man2_2.1 && y >= man2_2.3 { Man2 }
 	else if x >= girl1.0 && x <= girl1.2 && y <= girl1.1 && y >= girl1.3 { Girl1 }
 	else if x >= girl2.0 && x <= girl2.2 && y <= girl2.1 && y >= girl2.3 { Girl2 }
+	else if x >= owl1.0 && x <= owl1.2 && y <= owl1.1 && y >= owl1.3 { Owl1 }
+	else if x >= owl2.0 && x <= owl2.2 && y <= owl2.1 && y >= owl2.3 { Owl2 }
+	else if x >= owl3.0 && x <= owl3.2 && y <= owl3.1 && y >= owl3.3 { Owl3 }
 	else {NoObject}
 }
 
