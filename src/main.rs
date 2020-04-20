@@ -4,9 +4,10 @@ use ggez::input::keyboard::KeyCode;
 use ggez::input::keyboard::KeyMods;
 use ggez::input::mouse::MouseButton;
 
+mod assets;
 mod resources;
 
-use resources::Resources;
+use crate::resources::Resources;
 
 
 const GAME_ID: &str = "ludum-dare-46";

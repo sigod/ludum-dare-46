@@ -5,6 +5,8 @@ use serde::Deserialize;
 use std::fs::File;
 use std::path::Path;
 
+use crate::assets::TextFragments;
+
 
 #[derive(Debug, Deserialize)]
 pub struct Grid {
@@ -115,6 +117,7 @@ pub struct Resources {
 	pub static_animations: Animations,
 	pub menu: Image,
 	pub background: Image,
+	pub text: TextFragments,
 }
 
 impl Resources {
@@ -122,11 +125,13 @@ impl Resources {
 		let static_animations = Animations::load(context, &resource_path.join("static_animations.ron"))?;
 		let menu = Image::new(context, "/menu.png")?;
 		let background = Image::new(context, "/background.png")?;
+		let text = TextFragments::load(context)?;
 
 		Ok(Self {
 			static_animations,
 			menu,
 			background,
+			text,
 		})
 	}
 }
