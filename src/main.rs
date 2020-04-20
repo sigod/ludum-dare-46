@@ -1,5 +1,8 @@
 use ggez::{self, *};
 use ggez::graphics::Drawable;
+use ggez::input::keyboard::KeyCode;
+use ggez::input::keyboard::KeyMods;
+use ggez::input::mouse::MouseButton;
 
 mod resources;
 
@@ -67,6 +70,37 @@ impl event::EventHandler for MainState {
 	fn resize_event(&mut self, context: &mut Context, width: f32, height: f32) {
 		log::info!("received resize event: {}x{}", width, height);
 		log::info!("screen_coordinates: {:?}", graphics::screen_coordinates(context));
+	}
+
+	fn mouse_button_down_event(&mut self, _context: &mut Context, button: MouseButton, x: f32, y: f32) {
+		log::debug!("mouse down: {:?} - {}x{}", button, x, y);
+	}
+
+	fn mouse_button_up_event(&mut self, _context: &mut Context, button: MouseButton, x: f32, y: f32) {
+		log::debug!("mouse up: {:?} - {}x{}", button, x, y);
+
+		if self.is_menu {
+			self.is_menu = false;
+		}
+		else {
+			// TODO: Detect click target.
+		}
+	}
+
+	fn key_down_event(&mut self, context: &mut Context, keycode: KeyCode, _keymods: KeyMods, repeat: bool) {
+		if !repeat {
+			if keycode == KeyCode::Escape {
+				if self.is_menu {
+					ggez::event::quit(context);
+				}
+				else {
+					self.is_menu = true;
+				}
+			}
+		}
+	}
+
+	fn key_up_event(&mut self, _context: &mut Context, _keycode: KeyCode, _keymods: KeyMods) {
 	}
 }
 
