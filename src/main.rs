@@ -7,9 +7,11 @@ use ggez::input::mouse::MouseButton;
 
 mod assets;
 mod resources;
+mod constants;
 
 use crate::assets::play_random;
 use crate::resources::Resources;
+use crate::constants::FIRE_DROP_OFF_RATE;
 
 
 const GAME_ID: &str = "ludum-dare-46";
@@ -98,7 +100,7 @@ impl MainState {
 		self.resources.static_animations.animation_id = resources::AnimationId::BurnMedium;
 
 		self.fire_intensity = 0.30;
-		self.fire_drop_off = -0.02; //fire intensity drop off rate
+		self.fire_drop_off = -FIRE_DROP_OFF_RATE; //fire intensity drop off rate
 		self.wood_increase = 0.20;
 
 		self.story_id = 0;

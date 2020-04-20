@@ -9,6 +9,7 @@ use std::path::Path;
 
 use crate::assets::Sounds;
 use crate::assets::StoryFragments;
+use crate::constants::BACKGROUND_MUSIC_VOLUME;
 
 
 #[derive(Debug, Deserialize)]
@@ -223,7 +224,7 @@ impl Resources {
 		let campfire_sound = Source::new(context, "/audio/campfire.mp3")?;
 		let sounds = Sounds::load(context)?;
 
-		music.set_volume(0.30);
+		music.set_volume(BACKGROUND_MUSIC_VOLUME);
 
 		Ok(Self {
 			static_animations,
