@@ -114,16 +114,19 @@ impl Animations {
 pub struct Resources {
 	pub static_animations: Animations,
 	pub menu: Image,
+	pub background: Image,
 }
 
 impl Resources {
 	pub fn load(context: &mut ggez::Context, resource_path: &Path) -> Result<Self, Box<dyn std::error::Error>> {
 		let static_animations = Animations::load(context, &resource_path.join("static_animations.ron"))?;
 		let menu = Image::new(context, "/menu.png")?;
+		let background = Image::new(context, "/background.png")?;
 
 		Ok(Self {
 			static_animations,
 			menu,
+			background,
 		})
 	}
 }

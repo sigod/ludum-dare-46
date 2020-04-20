@@ -16,12 +16,16 @@ const DESIRED_FPS: u32 = 70;
 
 struct MainState {
 	resources: Resources,
+
+	is_menu: bool,
 }
 
 impl MainState {
 	pub fn new(_context: &mut Context, resources: Resources) -> Self {
 		Self {
 			resources,
+
+			is_menu: true,
 		}
 	}
 }
@@ -48,8 +52,14 @@ impl event::EventHandler for MainState {
 		graphics::clear(context, graphics::Color::from((1.0, 0.078, 0.576, 0.0)));
 
 		// TODO: Draw scenes.
-		self.resources.menu.draw(context, graphics::DrawParam::default())?;
-		self.resources.static_animations.draw(context);
+
+		if self.is_menu {
+			self.resources.menu.draw(context, graphics::DrawParam::default())?;
+		}
+		else {
+			self.resources.background.draw(context, graphics::DrawParam::default())?;
+			self.resources.static_animations.draw(context);
+		}
 
 		graphics::present(context)
 	}
