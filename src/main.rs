@@ -177,6 +177,7 @@ impl event::EventHandler for MainState {
 			self.update_logic(delta);
 			self.resources.static_animations.animate(context);
 			let _ = self.resources.music.play_later();
+			let _ = self.resources.campfire_sound.play_later();
 
 			has_updated = true;
 		}

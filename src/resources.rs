@@ -150,6 +150,7 @@ pub struct Resources {
 	pub story: StoryFragments,
 	pub text_empty: Image,
 	pub music: Source,
+	pub campfire_sound: Source,
 	pub sounds: Sounds,
 }
 
@@ -161,6 +162,7 @@ impl Resources {
 		let story = StoryFragments::load(context)?;
 		let text_empty = Image::new(context, "/story/text_empty.png")?;
 		let music = Source::new(context, "/audio/demo_1.2.ogg")?;
+		let campfire_sound = Source::new(context, "/audio/campfire.mp3")?;
 		let sounds = Sounds::load(context)?;
 
 		Ok(Self {
@@ -170,6 +172,7 @@ impl Resources {
 			story,
 			text_empty,
 			music,
+			campfire_sound,
 			sounds,
 		})
 	}
