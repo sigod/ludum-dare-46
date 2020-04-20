@@ -1,5 +1,9 @@
 use ggez::{self, *};
 
+mod resources;
+
+use resources::Resources;
+
 
 const GAME_ID: &str = "ludum-dare-46";
 const GAME_TITLE: &str = "Ember Story";
@@ -10,11 +14,13 @@ const DESIRED_FPS: u32 = 70;
 
 
 struct MainState {
+	resources: Resources,
 }
 
 impl MainState {
-	pub fn new(_context: &mut Context, _resource_path: &std::path::Path) -> Self {
+	pub fn new(_context: &mut Context, resources: Resources) -> Self {
 		Self {
+			resources,
 		}
 	}
 }
@@ -85,7 +91,8 @@ fn main() {
 	log::info!("main: screen_coordinates: {:?}", graphics::screen_coordinates(context));
 
 
-	let state = &mut MainState::new(context, &resource_path);
+	let resources = Resources::load(&resource_path).unwrap();
+	let state = &mut MainState::new(context, resources);
 
 	if let Err(e) = event::run(context, ev, state) {
 		log::error!("Error encountered: {}", e);
