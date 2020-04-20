@@ -1,5 +1,5 @@
 use ggez::Context;
-use ggez::audio::Source;
+use ggez::audio::{Source, SoundSource};
 use ggez::graphics::{Drawable, DrawParam, Image};
 use ggez::timer;
 use ron::de::from_reader;
@@ -161,9 +161,11 @@ impl Resources {
 		let background = Image::new(context, "/background.png")?;
 		let story = StoryFragments::load(context)?;
 		let text_empty = Image::new(context, "/story/text_empty.png")?;
-		let music = Source::new(context, "/audio/demo_1.2.ogg")?;
+		let mut music = Source::new(context, "/audio/demo_1.2.ogg")?;
 		let campfire_sound = Source::new(context, "/audio/campfire.mp3")?;
 		let sounds = Sounds::load(context)?;
+
+		music.set_volume(0.70);
 
 		Ok(Self {
 			static_animations,
