@@ -17,10 +17,59 @@ const DIMENSIONS: (f32, f32) = (1280.0, 800.0);
 const DESIRED_FPS: u32 = 70;
 
 
+#[derive(Debug)]
+enum GameObject {
+	Fire,
+	Man1,
+	Man2,
+	Girl1,
+	Girl2,
+	Owl1,
+	Owl2,
+	Owl3,
+}
+
+fn get_clicked_object(x: f32, y: f32) -> Option<GameObject> {
+	let fire: (f32, f32, f32, f32) = (463.0, 695.0, 796.0, 644.0);
+	let fire_2: (f32, f32, f32, f32) =  (559.0, 630.0, 669.0, 519.0);
+	let man1: (f32, f32, f32, f32) = (330.0, 603.0, 506.0, 368.0);
+	let man2: (f32, f32, f32, f32) = (915.0, 672.0, 990.0, 570.0);
+	let man2_2: (f32, f32, f32, f32) = (1001.0, 688.0, 1148.0, 387.0);
+	let girl1: (f32, f32, f32, f32) = (72.0, 719.0, 309.0, 437.0);
+	let girl2: (f32, f32, f32, f32) = (752.0, 590.0, 885.0, 366.0);
+	let owl1: (f32, f32, f32, f32) = (55.0, 292.0, 117.0, 242.0);
+	let owl2: (f32, f32, f32, f32) =  (139.0, 65.0, 196.0, 25.0);
+	let owl3: (f32, f32, f32, f32) = (1125.0, 161.0, 1182.0, 109.0);
+
+	fn check(x: f32, y: f32, bound: (f32, f32, f32, f32)) -> bool {
+		x >= bound.0 && x <= bound.2 && y <= bound.1 && y >= bound.3
+	}
+
+	use GameObject::*;
+
+	if check(x, y, fire) { Some(Fire) }
+	else if check(x, y, fire_2) { Some(Fire) }
+	else if check(x, y, man1) { Some(Man1) }
+	else if check(x, y, man2) { Some(Man2) }
+	else if check(x, y, man2_2) { Some(Man2) }
+	else if check(x, y, girl1) { Some(Girl1) }
+	else if check(x, y, girl2) { Some(Girl2) }
+	else if check(x, y, owl1) { Some(Owl1) }
+	else if check(x, y, owl2) { Some(Owl2) }
+	else if check(x, y, owl3) { Some(Owl3) }
+	else { None }
+}
+
+
 struct MainState {
 	resources: Resources,
 
 	is_menu: bool,
+
+	pub animation_state: resources::AnimationId,
+	pub fire_intensity: f64,
+	pub fire_drop_off: f64,
+	pub wood_increase: f64,
 }
 
 impl MainState {
@@ -29,7 +78,53 @@ impl MainState {
 			resources,
 
 			is_menu: true,
+
+			animation_state: resources::AnimationId::BurnLow,
+			fire_intensity: 0.,
+			fire_drop_off: 0.,
+			wood_increase: 0.2,
 		}
+	}
+
+	pub fn reset_game(&mut self) {
+		self.animation_state = resources::AnimationId::BurnMedium;
+		self.fire_intensity = 0.30;
+		self.fire_drop_off = -0.05;
+		self.wood_increase = 0.20;
+	}
+
+	pub fn update_logic(&mut self, delta: f64) {
+		if !self.is_menu {
+			self.fire_intensity += self.fire_drop_off * delta;
+
+			let next_state = if self.fire_intensity < 0.0 {
+				None
+			}
+			else if self.fire_intensity < 0.33 {
+				Some(resources::AnimationId::BurnLow)
+			}
+			else if self.fire_intensity < 0.66 {
+				Some(resources::AnimationId::BurnMedium)
+			}
+			else {
+				Some(resources::AnimationId::BurnHigh)
+			};
+
+			if let Some(state) = next_state {
+				if self.animation_state != state {
+					log::info!("changing animation state: {:?} -> {:?}", self.animation_state, state);
+					self.animation_state = state;
+				}
+			}
+			else {
+				log::info!("fire's gone");
+				self.is_menu = true;
+			}
+		}
+	}
+
+	pub fn add_wood(&mut self) {
+		self.fire_intensity += self.wood_increase;
 	}
 }
 
@@ -41,6 +136,10 @@ impl event::EventHandler for MainState {
 			if has_updated {
 				continue;
 			}
+
+			let delta = timer::duration_to_f64(timer::delta(context));
+
+			self.update_logic(delta);
 
 			// TODO: Update scenes.
 			has_updated = true;
@@ -81,9 +180,26 @@ impl event::EventHandler for MainState {
 
 		if self.is_menu {
 			self.is_menu = false;
+			self.reset_game();
 		}
 		else {
-			// TODO: Detect click target.
+			let object = get_clicked_object(x, y);
+
+			if let Some(object) = object {
+				match object {
+					GameObject::Fire => {
+						log::info!("clicked: fire");
+						self.add_wood();
+					},
+					GameObject::Man1 => log::info!("clicked: man1"),
+					GameObject::Man2 => log::info!("clicked: man2"),
+					GameObject::Girl1 => log::info!("clicked: girl1"),
+					GameObject::Girl2 => log::info!("clicked: girl2"),
+					GameObject::Owl1
+					| GameObject::Owl2
+					| GameObject::Owl3 => log::info!("clicked: an own"),
+				};
+			}
 		}
 	}
 

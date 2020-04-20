@@ -15,7 +15,7 @@ pub struct Grid {
 	pub cell_size: (u32, u32),
 }
 
-#[derive(Debug, Deserialize)]
+#[derive(Debug, Deserialize, PartialEq)]
 pub enum AnimationId {
 	BurnLow,
 	BurnMedium,
