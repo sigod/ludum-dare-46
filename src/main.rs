@@ -98,7 +98,7 @@ impl MainState {
 		self.resources.static_animations.animation_id = resources::AnimationId::BurnMedium;
 
 		self.fire_intensity = 0.30;
-		self.fire_drop_off = -0.05;
+		self.fire_drop_off = -0.02; //fire intensity drop off rate
 		self.wood_increase = 0.20;
 
 		self.story_id = 0;

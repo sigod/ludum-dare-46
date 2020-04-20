@@ -165,7 +165,7 @@ impl Resources {
 		let campfire_sound = Source::new(context, "/audio/campfire.mp3")?;
 		let sounds = Sounds::load(context)?;
 
-		music.set_volume(0.70);
+		music.set_volume(0.30);
 
 		Ok(Self {
 			static_animations,
