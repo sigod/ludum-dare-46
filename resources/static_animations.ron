@@ -15,7 +15,55 @@ AnimationsDto(
 					(
 						input: [0.0, 0.1, 0.2, 0.3, 0.4, 0.5, 0.6],
 						output: [0, 1, 2, 3, 4, 5, 0],
-					)
+					),
+				),
+				(
+					BurnMedium,
+					(
+						input: [0.0, 0.1, 0.2, 0.3, 0.4, 0.5, 0.6],
+						output: [6, 7, 8, 9, 10, 11, 6],
+					),
+				)
+				(
+					BurnHigh,
+					(
+						input: [0.0, 0.1, 0.2, 0.3, 0.4, 0.5, 0.6],
+						output: [12, 13, 14, 15, 16, 17, 12],
+					),
+				)
+			]
+		),
+
+		AnimationDto(
+			texture: "/background_shadows.png",
+			sprites_grid: Grid(
+				texture_width: 3840,
+				texture_height: 2400,
+				columns: 3,
+				rows: 3,
+				cell_size: (1280, 800),
+			),
+			animation_set: [
+				(
+					BurnLow,
+					(
+						input: [0.0, 0.1, 0.2, 0.3],
+						output: [0, 1, 2, 0],
+					),
+				),
+				(
+					BurnMedium,
+					(
+						input: [0.0, 0.1, 0.2, 0.3],
+						output: [3, 4, 5, 3],
+					),
+				)
+				(
+					BurnHigh,
+					(
+						input: [0.0, 0.1, 0.2, 0.3],
+						output: [6, 7, 8, 6],
+					),
 				)
 			]
 		),
