@@ -1,3 +1,3 @@
-pub mod text;
+pub mod story;
 
-pub use text::TextFragments;
+pub use story::StoryFragments;
