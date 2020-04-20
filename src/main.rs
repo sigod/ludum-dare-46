@@ -89,11 +89,11 @@ impl MainState {
 
 	pub fn reset_game(&mut self) {
 		self.resources.static_animations.reset();
-		self.resources.static_animations.animation_id = resources::AnimationId::BurnMedium;
+		self.resources.static_animations.animation_id = STARTING_ANIMATION;
 
-		self.fire_intensity = 0.30;
+		self.fire_intensity = FIRE_STARTING_INTENSITY;
 		self.fire_drop_off = -FIRE_DROP_OFF_RATE;
-		self.wood_increase = 0.20;
+		self.wood_increase = WOOD_INCREASE;
 
 		self.story_id = 0;
 		self.story_in_progress = false;
@@ -106,10 +106,10 @@ impl MainState {
 			let next_state = if self.fire_intensity < 0.0 {
 				None
 			}
-			else if self.fire_intensity < 0.33 {
+			else if self.fire_intensity < ANIMATION_LOW_IS_BELOW {
 				Some(resources::AnimationId::BurnLow)
 			}
-			else if self.fire_intensity < 0.66 {
+			else if self.fire_intensity < ANIMATION_MEDIUM_IS_BELOW {
 				Some(resources::AnimationId::BurnMedium)
 			}
 			else {
@@ -180,7 +180,8 @@ impl event::EventHandler for MainState {
 	}
 
 	fn draw(&mut self, context: &mut Context) -> GameResult<()> {
-		graphics::clear(context, graphics::Color::from((1.0, 0.078, 0.576, 0.0)));
+		let pink = (1.0, 0.078, 0.576, 0.0);
+		graphics::clear(context, graphics::Color::from(pink));
 
 		// TODO: Draw scenes.
 
