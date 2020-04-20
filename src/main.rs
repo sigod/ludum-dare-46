@@ -8,6 +8,7 @@ use ggez::input::mouse::MouseButton;
 mod assets;
 mod resources;
 
+use crate::assets::play_random;
 use crate::resources::Resources;
 
 
@@ -175,12 +176,10 @@ impl event::EventHandler for MainState {
 
 			self.update_logic(delta);
 			self.resources.static_animations.animate(context);
+			let _ = self.resources.music.play_later();
 
-			// TODO: Update scenes.
 			has_updated = true;
 		}
-
-		// TODO: input.update(timer::duration_to_f64(timer::delta(context)) as f32);
 
 		Ok(())
 	}
@@ -235,14 +234,21 @@ impl event::EventHandler for MainState {
 					GameObject::Fire => {
 						log::info!("clicked: fire");
 						self.add_wood();
+						let _ = play_random(&mut self.resources.sounds.firewood);
 					},
 					GameObject::Man1 => log::info!("clicked: man1"),
-					GameObject::Man2 => log::info!("clicked: man2"),
+					GameObject::Man2 => {
+						log::info!("clicked: man2");
+						let _ = play_random(&mut self.resources.sounds.guitar);
+					},
 					GameObject::Girl1 => log::info!("clicked: girl1"),
 					GameObject::Girl2 => log::info!("clicked: girl2"),
 					GameObject::Owl1
 					| GameObject::Owl2
-					| GameObject::Owl3 => log::info!("clicked: an own"),
+					| GameObject::Owl3 => {
+						log::info!("clicked: an own");
+						let _ = play_random(&mut self.resources.sounds.owl);
+					},
 				};
 			}
 		}

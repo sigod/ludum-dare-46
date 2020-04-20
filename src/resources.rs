@@ -1,4 +1,5 @@
 use ggez::Context;
+use ggez::audio::Source;
 use ggez::graphics::{Drawable, DrawParam, Image};
 use ggez::timer;
 use ron::de::from_reader;
@@ -6,6 +7,7 @@ use serde::Deserialize;
 use std::fs::File;
 use std::path::Path;
 
+use crate::assets::Sounds;
 use crate::assets::StoryFragments;
 
 
@@ -147,6 +149,8 @@ pub struct Resources {
 	pub background: Image,
 	pub story: StoryFragments,
 	pub text_empty: Image,
+	pub music: Source,
+	pub sounds: Sounds,
 }
 
 impl Resources {
@@ -156,6 +160,8 @@ impl Resources {
 		let background = Image::new(context, "/background.png")?;
 		let story = StoryFragments::load(context)?;
 		let text_empty = Image::new(context, "/story/text_empty.png")?;
+		let music = Source::new(context, "/audio/demo_1.2.ogg")?;
+		let sounds = Sounds::load(context)?;
 
 		Ok(Self {
 			static_animations,
@@ -163,6 +169,8 @@ impl Resources {
 			background,
 			story,
 			text_empty,
+			music,
+			sounds,
 		})
 	}
 }
