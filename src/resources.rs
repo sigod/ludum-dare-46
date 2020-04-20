@@ -44,7 +44,8 @@ pub struct Animation {
 	pub texture: Image,
 	pub draw_param: DrawParam,
 
-	// TODO: Store the time we've started animation?
+	pub animated: bool,
+	pub start_time: f64,
 
 	pub sprites_grid: Grid,
 	pub animation_set: Vec<(AnimationId, AnimationFrames)>,
@@ -60,13 +61,18 @@ impl Animation {
 			texture,
 			draw_param: DrawParam::default(),
 
+			animated: false,
+			start_time: 0.0,
+
 			sprites_grid: dto.sprites_grid,
 			animation_set: dto.animation_set,
 		})
 	}
 
 	pub fn draw(&self, context: &mut Context) -> ggez::GameResult {
-		self.texture.draw(context, self.draw_param)?;
+		if self.animated {
+			self.texture.draw(context, self.draw_param)?;
+		}
 
 		Ok(())
 	}
@@ -78,15 +84,65 @@ impl Animation {
 
 				let current_time = timer::duration_to_f64(timer::time_since_start(context));
 
-				// TODO: Use `frames` to figure out which frame we should be showing.
-				// TODO: Update self.draw_param accordingly.
-				// See https://docs.rs/ggez/0.5.1/ggez/graphics/struct.DrawParam.html
+				let frame = if !self.animated {
+					self.start_time = current_time;
+					self.animated = true;
+
+					frames.output.get(0).unwrap()
+				}
+				else {
+					let mut diff = current_time - self.start_time;
+
+					let last = frames.input.last().unwrap().clone() as f64;
+
+					while diff > last {
+						diff -= last;
+					}
+
+					let mut highest_index = 0;
+
+					for (index, &timing) in frames.input.iter().enumerate() {
+						if diff > timing as f64 {
+							highest_index = index;
+						}
+						else {
+							break;
+						}
+					}
+
+					// log::debug!("diff: {}, highest_index: {}", diff, highest_index);
+
+					frames.output.get(highest_index).unwrap()
+				};
+
+				let column: u32 = frame % self.sprites_grid.columns;
+				let row: u32 = frame / self.sprites_grid.columns;
+
+				let mut source = ggez::graphics::Rect::default();
+
+				let (cell_x, cell_y) = self.sprites_grid.cell_size;
+
+				source.x = (column * cell_x) as f32;
+				source.y = (row * cell_y) as f32;
+				source.w = ((column + 1) * cell_x) as f32;
+				source.h = ((row + 1) * cell_y) as f32;
+
+				// log::debug!("frame {} -> {:?}", frame, source);
+
+				source.x = source.x / self.sprites_grid.texture_width as f32;
+				source.y = source.y / self.sprites_grid.texture_height as f32;
+				source.w = source.w / self.sprites_grid.texture_width as f32 - source.x;
+				source.h = source.h / self.sprites_grid.texture_height as f32 - source.y;
+
+				// log::debug!("frame {} -> {:?}", frame, source);
+
+				self.draw_param.src = source;
 			}
 		}
 	}
 
 	pub fn reset(&mut self) {
-		// TODO: Reset animation counters or whatever.
+		self.animated = false;
 	}
 }
 
