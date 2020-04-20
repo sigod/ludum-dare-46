@@ -67,7 +67,6 @@ struct MainState {
 
 	is_menu: bool,
 
-	pub animation_state: resources::AnimationId,
 	pub fire_intensity: f64,
 	pub fire_drop_off: f64,
 	pub wood_increase: f64,
@@ -80,7 +79,6 @@ impl MainState {
 
 			is_menu: true,
 
-			animation_state: resources::AnimationId::BurnLow,
 			fire_intensity: 0.,
 			fire_drop_off: 0.,
 			wood_increase: 0.2,
@@ -88,7 +86,9 @@ impl MainState {
 	}
 
 	pub fn reset_game(&mut self) {
-		self.animation_state = resources::AnimationId::BurnMedium;
+		self.resources.static_animations.reset();
+		self.resources.static_animations.animation_id = resources::AnimationId::BurnMedium;
+
 		self.fire_intensity = 0.30;
 		self.fire_drop_off = -0.05;
 		self.wood_increase = 0.20;
@@ -112,9 +112,9 @@ impl MainState {
 			};
 
 			if let Some(state) = next_state {
-				if self.animation_state != state {
-					log::info!("changing animation state: {:?} -> {:?}", self.animation_state, state);
-					self.animation_state = state;
+				if self.resources.static_animations.animation_id != state {
+					log::info!("changing animation state: {:?} -> {:?}", self.resources.static_animations.animation_id, state);
+					self.resources.static_animations.animation_id = state;
 				}
 			}
 			else {
@@ -141,6 +141,7 @@ impl event::EventHandler for MainState {
 			let delta = timer::duration_to_f64(timer::delta(context));
 
 			self.update_logic(delta);
+			self.resources.static_animations.animate(context);
 
 			// TODO: Update scenes.
 			has_updated = true;
@@ -161,7 +162,7 @@ impl event::EventHandler for MainState {
 		}
 		else {
 			self.resources.background.draw(context, graphics::DrawParam::default())?;
-			self.resources.static_animations.draw(context);
+			self.resources.static_animations.draw(context)?;
 		}
 
 		graphics::present(context)

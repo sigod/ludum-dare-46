@@ -1,5 +1,6 @@
 use ggez::Context;
 use ggez::graphics::{Drawable, DrawParam, Image};
+use ggez::timer;
 use ron::de::from_reader;
 use serde::Deserialize;
 use std::fs::File;
@@ -17,7 +18,7 @@ pub struct Grid {
 	pub cell_size: (u32, u32),
 }
 
-#[derive(Debug, Deserialize, PartialEq)]
+#[derive(Copy, Clone, Debug, Deserialize, PartialEq)]
 pub enum AnimationId {
 	BurnLow,
 	BurnMedium,
@@ -40,6 +41,8 @@ pub struct AnimationDto {
 pub struct Animation {
 	pub texture: Image,
 	pub draw_param: DrawParam,
+
+	// TODO: Store the time we've started animation?
 
 	pub sprites_grid: Grid,
 	pub animation_set: Vec<(AnimationId, AnimationFrames)>,
@@ -66,12 +69,22 @@ impl Animation {
 		Ok(())
 	}
 
-	pub fn animate(&mut self, context: &mut Context) {
-		// if not started
-		// let start = duration_to_f64(time_since_start(context));
+	pub fn animate(&mut self, context: &mut Context, animation_id: AnimationId) {
+		for set in self.animation_set.iter() {
+			if set.0 == animation_id {
+				let frames: &AnimationFrames = &set.1;
 
-		// TODO: Get time diff and select correct frame in AnimationFrames.
-		// TODO: Update self.draw_param.src to change which sprite (from sprite sheet) should be drawn.
+				let current_time = timer::duration_to_f64(timer::time_since_start(context));
+
+				// TODO: Use `frames` to figure out which frame we should be showing.
+				// TODO: Update self.draw_param accordingly.
+				// See https://docs.rs/ggez/0.5.1/ggez/graphics/struct.DrawParam.html
+			}
+		}
+	}
+
+	pub fn reset(&mut self) {
+		// TODO: Reset animation counters or whatever.
 	}
 }
 
@@ -83,6 +96,8 @@ pub struct AnimationsDto {
 
 pub struct Animations {
 	pub animations: Vec<Animation>,
+
+	pub animation_id: AnimationId,
 }
 
 impl Animations {
@@ -100,15 +115,28 @@ impl Animations {
 
 		Ok(Self {
 			animations,
+			animation_id: AnimationId::BurnLow,
 		})
 	}
 
-	pub fn draw(&self, context: &mut Context) {
-		// TODO: Iterate all animations and draw() them.
+	pub fn draw(&self, context: &mut Context) -> ggez::GameResult {
+		for animation in self.animations.iter() {
+			animation.draw(context)?;
+		}
+
+		Ok(())
 	}
 
-	pub fn animate() {
-		// TODO: Same - for all.
+	pub fn animate(&mut self, context: &mut Context) {
+		for animation in self.animations.iter_mut() {
+			animation.animate(context, self.animation_id);
+		}
+	}
+
+	pub fn reset(&mut self) {
+		for animation in self.animations.iter_mut() {
+			animation.reset();
+		}
 	}
 }
 
