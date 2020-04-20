@@ -1,4 +1,5 @@
 use ggez::{self, *};
+use ggez::audio::SoundSource;
 use ggez::graphics::Drawable;
 use ggez::input::keyboard::KeyCode;
 use ggez::input::keyboard::KeyMods;
@@ -70,6 +71,9 @@ struct MainState {
 	pub fire_intensity: f64,
 	pub fire_drop_off: f64,
 	pub wood_increase: f64,
+
+	pub story_id: usize,
+	pub story_in_progress: bool,
 }
 
 impl MainState {
@@ -81,7 +85,10 @@ impl MainState {
 
 			fire_intensity: 0.,
 			fire_drop_off: 0.,
-			wood_increase: 0.2,
+			wood_increase: 0.,
+
+			story_id: 0,
+			story_in_progress: false,
 		}
 	}
 
@@ -92,6 +99,9 @@ impl MainState {
 		self.fire_intensity = 0.30;
 		self.fire_drop_off = -0.05;
 		self.wood_increase = 0.20;
+
+		self.story_id = 0;
+		self.story_in_progress = false;
 	}
 
 	pub fn update_logic(&mut self, delta: f64) {
@@ -115,6 +125,29 @@ impl MainState {
 				if self.resources.static_animations.animation_id != state {
 					log::info!("changing animation state: {:?} -> {:?}", self.resources.static_animations.animation_id, state);
 					self.resources.static_animations.animation_id = state;
+				}
+
+				if !self.story_in_progress {
+					let (_, source) = self.resources.story.fragments.get_mut(self.story_id).unwrap();
+					let _ = source.play();
+
+					self.story_in_progress = true;
+					log::debug!("started playing {} story", self.story_id);
+				}
+				else {
+					let (_, source) = self.resources.story.fragments.get(self.story_id).unwrap();
+
+					if !source.playing() {
+						self.story_in_progress = false;
+						log::debug!("finished playing {} story", self.story_id);
+
+						self.story_id += 1;
+
+						if self.story_id == self.resources.story.fragments.len() {
+							log::debug!("finished playing all stories");
+							self.is_menu = true;
+						}
+					}
 				}
 			}
 			else {
@@ -163,6 +196,16 @@ impl event::EventHandler for MainState {
 		else {
 			self.resources.background.draw(context, graphics::DrawParam::default())?;
 			self.resources.static_animations.draw(context)?;
+
+			let text_param = graphics::DrawParam::default().dest(cgmath::Point2::new(100.0, 165.0));
+			if self.story_in_progress {
+				let (image, _) = self.resources.story.fragments.get(self.story_id).unwrap();
+
+				image.draw(context, text_param)?;
+			}
+			else {
+				self.resources.text_empty.draw(context, text_param)?;
+			}
 		}
 
 		graphics::present(context)

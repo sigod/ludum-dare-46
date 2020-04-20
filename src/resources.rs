@@ -146,6 +146,7 @@ pub struct Resources {
 	pub menu: Image,
 	pub background: Image,
 	pub story: StoryFragments,
+	pub text_empty: Image,
 }
 
 impl Resources {
@@ -154,12 +155,14 @@ impl Resources {
 		let menu = Image::new(context, "/menu.png")?;
 		let background = Image::new(context, "/background.png")?;
 		let story = StoryFragments::load(context)?;
+		let text_empty = Image::new(context, "/story/text_empty.png")?;
 
 		Ok(Self {
 			static_animations,
 			menu,
 			background,
 			story,
+			text_empty,
 		})
 	}
 }
