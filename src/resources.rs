@@ -223,7 +223,7 @@ impl Resources {
 		let story = StoryFragments::load(context)?;
 		let text_empty = Image::new(context, "/story/text_empty.png")?;
 		let mut music = Source::new(context, "/audio/demo_1.2.ogg")?;
-		let mut campfire_sound = Source::new(context, "/audio/campfire.mp3")?;
+		let mut campfire_sound = Source::new(context, "/audio/campfire.ogg")?;
 		let sounds = Sounds::load(context)?;
 		let end_screen_fail = Image::new(context, "/end_screen_fail.png")?;
 		let end_screen_success = Image::new(context, "/end_screen_success.png")?;
