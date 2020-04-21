@@ -1,3 +1,5 @@
+#![cfg_attr(not(debug_assertions), windows_subsystem = "windows")]
+
 use ggez::{self, *};
 use ggez::audio::SoundSource;
 use ggez::graphics::Drawable;
@@ -323,7 +325,9 @@ impl event::EventHandler for MainState {
 
 fn main() {
 	flexi_logger::Logger::with_env_or_str("error, ludum_dare_46=debug")
-		// .format(flexi_logger::detailed_format)
+		.format(flexi_logger::detailed_format)
+		// TODO: Log into stderr too.
+		.log_to_file()
 		.start()
 		.unwrap_or_else(|e| panic!("Logger initialization failed with {}", e));
 
