@@ -229,10 +229,14 @@ impl event::EventHandler for MainState {
 				self.resources.static_animations.animate(context);
 			}
 
-			let _ = self.resources.music.play_later();
+			if !self.resources.music.playing() {
+				let _ = self.resources.music.play_later();
+			}
 
 			if self.scene != Scene::EndScreenFail {
-				let _ = self.resources.campfire_sound.play_later();
+				if !self.resources.campfire_sound.playing() {
+					let _ = self.resources.campfire_sound.play_later();
+				}
 			}
 
 			has_updated = true;
