@@ -17,8 +17,9 @@ pub const STORY_VOLUME: f32 = 0.30;
 pub const FIREWOOD_THROW_VOLUME: f32 = 0.30;
 pub const BACKGROUND_MUSIC_VOLUME: f32 = 0.30;
 
+pub const STORY_DELAY: f64 = 3.0;
 pub const STARTING_ANIMATION: AnimationId = AnimationId::BurnMedium;
-pub const FIRE_STARTING_INTENSITY: f64 = 0.30;
+pub const FIRE_STARTING_INTENSITY: f64 = 0.60;
 pub const FIRE_DROP_OFF_RATE: f64 = 0.03;
 pub const WOOD_INCREASE: f64 = 0.20;
 

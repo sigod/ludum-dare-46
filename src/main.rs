@@ -78,6 +78,8 @@ struct MainState {
 
 	pub story_id: usize,
 	pub story_in_progress: bool,
+
+	pub delayed_start_after: f64,
 }
 
 impl MainState {
@@ -93,6 +95,8 @@ impl MainState {
 
 			story_id: 0,
 			story_in_progress: false,
+
+			delayed_start_after: STORY_DELAY,
 		}
 	}
 
@@ -130,27 +134,32 @@ impl MainState {
 				self.resources.static_animations.animation_id = state;
 			}
 
-			if !self.story_in_progress {
-				let (_, source) = self.resources.story.fragments.get_mut(self.story_id).unwrap();
-				let _ = source.play();
+			if self.delayed_start_after < 0.0 {
+				if !self.story_in_progress {
+					let (_, source) = self.resources.story.fragments.get_mut(self.story_id).unwrap();
+					let _ = source.play();
 
-				self.story_in_progress = true;
-				log::debug!("started playing {} story", self.story_id);
-			}
-			else {
-				let (_, source) = self.resources.story.fragments.get(self.story_id).unwrap();
+					self.story_in_progress = true;
+					log::debug!("started playing {} story", self.story_id);
+				}
+				else {
+					let (_, source) = self.resources.story.fragments.get(self.story_id).unwrap();
 
-				if !source.playing() {
-					self.story_in_progress = false;
-					log::debug!("finished playing {} story", self.story_id);
+					if !source.playing() {
+						self.story_in_progress = false;
+						log::debug!("finished playing {} story", self.story_id);
 
-					self.story_id += 1;
+						self.story_id += 1;
 
-					if self.story_id == self.resources.story.fragments.len() {
-						log::debug!("finished playing all stories");
-						self.scene = Scene::EndScreenSuccess;
+						if self.story_id == self.resources.story.fragments.len() {
+							log::debug!("finished playing all stories");
+							self.scene = Scene::EndScreenSuccess;
+						}
 					}
 				}
+			}
+			else {
+				self.delayed_start_after -= delta;
 			}
 		}
 		else {
@@ -242,14 +251,16 @@ impl event::EventHandler for MainState {
 				self.resources.background.draw(context, graphics::DrawParam::default())?;
 				self.resources.static_animations.draw(context)?;
 
-				let text_param = graphics::DrawParam::default().dest(cgmath::Point2::new(100.0, 165.0));
-				if self.story_in_progress {
-					let (image, _) = self.resources.story.fragments.get(self.story_id).unwrap();
+				if self.delayed_start_after < 0.0 {
+					let text_param = graphics::DrawParam::default().dest(cgmath::Point2::new(100.0, 165.0));
+					if self.story_in_progress {
+						let (image, _) = self.resources.story.fragments.get(self.story_id).unwrap();
 
-					image.draw(context, text_param)?;
-				}
-				else {
-					self.resources.text_empty.draw(context, text_param)?;
+						image.draw(context, text_param)?;
+					}
+					else {
+						self.resources.text_empty.draw(context, text_param)?;
+					}
 				}
 			},
 			Scene::EndScreenFail => {
@@ -277,11 +288,13 @@ impl event::EventHandler for MainState {
 
 		match self.scene {
 			Scene::Menu => {
+				self.delayed_start_after = STORY_DELAY;
 				self.scene = Scene::Game;
 				self.reset_game();
 			},
 			Scene::EndScreenFail
 			| Scene::EndScreenSuccess => {
+				self.delayed_start_after = STORY_DELAY;
 				self.scene = Scene::Menu;
 			}
 			Scene::Game => {
