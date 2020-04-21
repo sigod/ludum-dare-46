@@ -1,7 +1,7 @@
 use ggez::Context;
 use ggez::audio::SoundSource;
 use ggez::audio::Source;
-use crate::constants::{FIREWOOD_THROW_VOLUME, OWL_VOLUME, GUITAR_VOLUME, MAN_VOLUME, GIRL1_VOLUME, GIRL2_VOLUME};
+use crate::constants::*;
 
 
 const FIREWOOD_COUNT: usize = 4;

@@ -58,10 +58,19 @@ fn get_clicked_object(x: f32, y: f32) -> Option<GameObject> {
 }
 
 
+#[derive(PartialEq)]
+pub enum Scene {
+	Menu,
+	Game,
+	EndScreenFail,
+	EndScreenSuccess,
+}
+
+
 struct MainState {
 	resources: Resources,
 
-	is_menu: bool,
+	scene: Scene,
 
 	pub fire_intensity: f64,
 	pub fire_drop_off: f64,
@@ -76,7 +85,7 @@ impl MainState {
 		Self {
 			resources,
 
-			is_menu: true,
+			scene: Scene::Menu,
 
 			fire_intensity: 0.,
 			fire_drop_off: 0.,
@@ -88,8 +97,8 @@ impl MainState {
 	}
 
 	pub fn reset_game(&mut self) {
-		self.resources.static_animations.reset();
 		self.resources.static_animations.animation_id = STARTING_ANIMATION;
+		self.resources.static_animations.reset();
 
 		self.fire_intensity = FIRE_STARTING_INTENSITY;
 		self.fire_drop_off = -FIRE_DROP_OFF_RATE;
@@ -100,60 +109,96 @@ impl MainState {
 	}
 
 	pub fn update_logic(&mut self, delta: f64) {
-		if !self.is_menu {
-			self.fire_intensity += self.fire_drop_off * delta;
+		self.fire_intensity += self.fire_drop_off * delta;
 
-			let next_state = if self.fire_intensity < 0.0 {
-				None
+		let next_state = if self.fire_intensity < 0.0 {
+			None
+		}
+		else if self.fire_intensity < ANIMATION_LOW_IS_BELOW {
+			Some(resources::AnimationId::BurnLow)
+		}
+		else if self.fire_intensity < ANIMATION_MEDIUM_IS_BELOW {
+			Some(resources::AnimationId::BurnMedium)
+		}
+		else {
+			Some(resources::AnimationId::BurnHigh)
+		};
+
+		if let Some(state) = next_state {
+			if self.resources.static_animations.animation_id != state {
+				log::debug!("changing animation state: {:?} -> {:?}", self.resources.static_animations.animation_id, state);
+				self.resources.static_animations.animation_id = state;
 			}
-			else if self.fire_intensity < ANIMATION_LOW_IS_BELOW {
-				Some(resources::AnimationId::BurnLow)
-			}
-			else if self.fire_intensity < ANIMATION_MEDIUM_IS_BELOW {
-				Some(resources::AnimationId::BurnMedium)
+
+			if !self.story_in_progress {
+				let (_, source) = self.resources.story.fragments.get_mut(self.story_id).unwrap();
+				let _ = source.play();
+
+				self.story_in_progress = true;
+				log::debug!("started playing {} story", self.story_id);
 			}
 			else {
-				Some(resources::AnimationId::BurnHigh)
-			};
+				let (_, source) = self.resources.story.fragments.get(self.story_id).unwrap();
 
-			if let Some(state) = next_state {
-				if self.resources.static_animations.animation_id != state {
-					log::debug!("changing animation state: {:?} -> {:?}", self.resources.static_animations.animation_id, state);
-					self.resources.static_animations.animation_id = state;
-				}
+				if !source.playing() {
+					self.story_in_progress = false;
+					log::debug!("finished playing {} story", self.story_id);
 
-				if !self.story_in_progress {
-					let (_, source) = self.resources.story.fragments.get_mut(self.story_id).unwrap();
-					let _ = source.play();
+					self.story_id += 1;
 
-					self.story_in_progress = true;
-					log::debug!("started playing {} story", self.story_id);
-				}
-				else {
-					let (_, source) = self.resources.story.fragments.get(self.story_id).unwrap();
-
-					if !source.playing() {
-						self.story_in_progress = false;
-						log::debug!("finished playing {} story", self.story_id);
-
-						self.story_id += 1;
-
-						if self.story_id == self.resources.story.fragments.len() {
-							log::debug!("finished playing all stories");
-							self.is_menu = true;
-						}
+					if self.story_id == self.resources.story.fragments.len() {
+						log::debug!("finished playing all stories");
+						self.scene = Scene::EndScreenSuccess;
 					}
 				}
 			}
-			else {
-				log::debug!("fire's gone");
-				self.is_menu = true;
-			}
+		}
+		else {
+			log::debug!("fire's gone");
+			self.scene = Scene::EndScreenFail;
 		}
 	}
 
 	pub fn add_wood(&mut self) {
 		self.fire_intensity += self.wood_increase;
+	}
+
+	pub fn handle_game_click(&mut self, x: f32, y: f32) {
+		let object = get_clicked_object(x, y);
+
+		if let Some(object) = object {
+			match object {
+				GameObject::Fire => {
+					log::debug!("clicked: fire");
+					self.add_wood();
+					let _ = play_random(&mut self.resources.sounds.firewood);
+				},
+				GameObject::Man1 => {
+					log::debug!("clicked: man1");
+					let _ = play_random(&mut self.resources.sounds.man1);
+				},
+				GameObject::Man2 => {
+					log::debug!("clicked: man2");
+					let _ = play_random(&mut self.resources.sounds.guitar);
+				},
+				GameObject::Girl1 => {
+					log::debug!("clicked: girl1");
+					let _ = play_random(&mut self.resources.sounds.girl1);
+				},
+
+				GameObject::Girl2 => {
+					log::debug!("clicked: girl2");
+					let _ = play_random(&mut self.resources.sounds.girl2);
+				},
+
+				GameObject::Owl1
+				| GameObject::Owl2
+				| GameObject::Owl3 => {
+					log::debug!("clicked: an own");
+					let _ = play_random(&mut self.resources.sounds.owl);
+				},
+			};
+		}
 	}
 }
 
@@ -168,10 +213,16 @@ impl event::EventHandler for MainState {
 
 			let delta = timer::duration_to_f64(timer::delta(context));
 
-			self.update_logic(delta);
-			self.resources.static_animations.animate(context);
+			if self.scene == Scene::Game {
+				self.update_logic(delta);
+				self.resources.static_animations.animate(context);
+			}
+
 			let _ = self.resources.music.play_later();
-			let _ = self.resources.campfire_sound.play_later();
+
+			if self.scene != Scene::EndScreenFail {
+				let _ = self.resources.campfire_sound.play_later();
+			}
 
 			has_updated = true;
 		}
@@ -183,24 +234,30 @@ impl event::EventHandler for MainState {
 		let pink = (1.0, 0.078, 0.576, 0.0);
 		graphics::clear(context, graphics::Color::from(pink));
 
-		// TODO: Draw scenes.
+		match self.scene {
+			Scene::Menu => {
+				self.resources.menu.draw(context, graphics::DrawParam::default())?;
+			},
+			Scene::Game => {
+				self.resources.background.draw(context, graphics::DrawParam::default())?;
+				self.resources.static_animations.draw(context)?;
 
-		if self.is_menu {
-			self.resources.menu.draw(context, graphics::DrawParam::default())?;
-		}
-		else {
-			self.resources.background.draw(context, graphics::DrawParam::default())?;
-			self.resources.static_animations.draw(context)?;
+				let text_param = graphics::DrawParam::default().dest(cgmath::Point2::new(100.0, 165.0));
+				if self.story_in_progress {
+					let (image, _) = self.resources.story.fragments.get(self.story_id).unwrap();
 
-			let text_param = graphics::DrawParam::default().dest(cgmath::Point2::new(100.0, 165.0));
-			if self.story_in_progress {
-				let (image, _) = self.resources.story.fragments.get(self.story_id).unwrap();
-
-				image.draw(context, text_param)?;
-			}
-			else {
-				self.resources.text_empty.draw(context, text_param)?;
-			}
+					image.draw(context, text_param)?;
+				}
+				else {
+					self.resources.text_empty.draw(context, text_param)?;
+				}
+			},
+			Scene::EndScreenFail => {
+				self.resources.end_screen_fail.draw(context, graphics::DrawParam::default())?;
+			},
+			Scene::EndScreenSuccess => {
+				self.resources.end_screen_success.draw(context, graphics::DrawParam::default())?;
+			},
 		}
 
 		graphics::present(context)
@@ -218,57 +275,29 @@ impl event::EventHandler for MainState {
 	fn mouse_button_up_event(&mut self, _context: &mut Context, button: MouseButton, x: f32, y: f32) {
 		log::debug!("mouse up: {:?} - {}x{}", button, x, y);
 
-		if self.is_menu {
-			self.is_menu = false;
-			self.reset_game();
-		}
-		else {
-			let object = get_clicked_object(x, y);
-
-			if let Some(object) = object {
-				match object {
-					GameObject::Fire => {
-						log::debug!("clicked: fire");
-						self.add_wood();
-						let _ = play_random(&mut self.resources.sounds.firewood);
-					},
-					GameObject::Man1 => {
-						log::debug!("clicked: man1");
-						let _ = play_random(&mut self.resources.sounds.man1);
-					},
-					GameObject::Man2 => {
-						log::debug!("clicked: man2");
-						let _ = play_random(&mut self.resources.sounds.guitar);
-					},
-					GameObject::Girl1 => {
-						log::debug!("clicked: girl1");
-						let _ = play_random(&mut self.resources.sounds.girl1);
-					},
-
-					GameObject::Girl2 => {
-						log::debug!("clicked: girl2");
-						let _ = play_random(&mut self.resources.sounds.girl2);
-					},
-
-					GameObject::Owl1
-					| GameObject::Owl2
-					| GameObject::Owl3 => {
-						log::debug!("clicked: an own");
-						let _ = play_random(&mut self.resources.sounds.owl);
-					},
-				};
+		match self.scene {
+			Scene::Menu => {
+				self.scene = Scene::Game;
+				self.reset_game();
+			},
+			Scene::EndScreenFail
+			| Scene::EndScreenSuccess => {
+				self.scene = Scene::Menu;
 			}
+			Scene::Game => {
+				self.handle_game_click(x, y);
+			},
 		}
 	}
 
 	fn key_down_event(&mut self, context: &mut Context, keycode: KeyCode, _keymods: KeyMods, repeat: bool) {
 		if !repeat {
 			if keycode == KeyCode::Escape {
-				if self.is_menu {
+				if self.scene == Scene::Menu {
 					ggez::event::quit(context);
 				}
 				else {
-					self.is_menu = true;
+					self.scene = Scene::Menu;
 				}
 			}
 		}

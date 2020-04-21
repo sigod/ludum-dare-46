@@ -1,7 +1,7 @@
 use ggez::audio::{Source, SoundSource};
 use ggez::Context;
 use ggez::graphics::Image;
-use crate::constants::STORY_VOLUME;
+use crate::constants::*;
 
 
 const FRAGMENTS_NUMBER: u32 = 42;

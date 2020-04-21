@@ -208,6 +208,8 @@ pub struct Resources {
 	pub background: Image,
 	pub story: StoryFragments,
 	pub text_empty: Image,
+	pub end_screen_fail: Image,
+	pub end_screen_success: Image,
 	pub music: Source,
 	pub campfire_sound: Source,
 	pub sounds: Sounds,
@@ -223,6 +225,8 @@ impl Resources {
 		let mut music = Source::new(context, "/audio/demo_1.2.ogg")?;
 		let mut campfire_sound = Source::new(context, "/audio/campfire.mp3")?;
 		let sounds = Sounds::load(context)?;
+		let end_screen_fail = Image::new(context, "/end_screen_fail.png")?;
+		let end_screen_success = Image::new(context, "/end_screen_success.png")?;
 
 		music.set_volume(BACKGROUND_MUSIC_VOLUME);
 		campfire_sound.set_volume(FIRE_VOLUME);
@@ -233,6 +237,8 @@ impl Resources {
 			background,
 			story,
 			text_empty,
+			end_screen_fail,
+			end_screen_success,
 			music,
 			campfire_sound,
 			sounds,
